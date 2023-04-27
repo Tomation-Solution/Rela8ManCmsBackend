@@ -207,13 +207,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
-
+#SENDIN BLUE MAILING SERVICES
 SENDAPIKEY = os.environ.get("SENDINBLUE_KEY")
 
 ANYMAIL = {
     "SENDINBLUE_API_KEY": SENDAPIKEY,
 }
 
+EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+
+
+SENDINBLUE_API_URL = "https://api.sendinblue.com/v3/"
+
 DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')  # if you don't already have this in settings
 SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER')  # ditto (default from-email for Django errors)
+
+
