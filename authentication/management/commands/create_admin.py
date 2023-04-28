@@ -2,7 +2,7 @@
 command for the application to bulk create roles
 """
 from django.core.management import BaseCommand
-from myauthentication.models import User
+from authentication.models import User
 import os
 
 
