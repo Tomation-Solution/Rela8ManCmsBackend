@@ -30,7 +30,7 @@ class AllServices(models.Model):
 class RequestService(models.Model):
     ref = models.CharField(max_length=100)
     name = models.CharField(max_length=300)
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     company_name = models.CharField(max_length=300)
     message = models.TextField()
     is_verified = models.BooleanField(default=False)

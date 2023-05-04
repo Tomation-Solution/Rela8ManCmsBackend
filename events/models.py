@@ -8,12 +8,10 @@ class Event(models.Model):
     image = models.ImageField(
         upload_to='images/events/', blank=True, null=True)
     name = models.CharField(max_length=300)
-    # WHETHER IT IS A SPECIAL EVENT OR NOT
-    is_special = models.BooleanField(default=False)
+    # WHETHER IT IS AN ANNUAL GENERAL MEETING EVENT OR NOT
+    is_agm = models.BooleanField(default=False)
     # THE GROUP OR SECTION THE EVENT IS FOR
     group_type = models.CharField(max_length=300)
-    # WHERE IT ONLINE OR INPERSON
-    payment_type = models.CharField(max_length=300)
     location = models.TextField()
     start_date = models.DateField()
     end_date = models.DateField()

@@ -17,10 +17,10 @@ class EventsSerializer(serializers.ModelSerializer):
         elif is_paid == False:
             if price:
                 raise exceptions.ValidationError(
-                    "price must be provided on free events.")
+                    "price must not be provided on free events.")
 
         return super().validate(attrs)
-    
+
     def update(self, instance, validated_data):
         is_paid = validated_data.get('is_paid', instance.is_paid)
 

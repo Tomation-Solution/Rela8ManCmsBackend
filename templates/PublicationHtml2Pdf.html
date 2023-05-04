@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAN Publication: {{name}}</title>
+
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame header_frame {           /* Static Frame */
+                -pdf-frame-content: header_content;
+                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            }
+            @frame content_frame {          /* Content Frame */
+                left: 50pt; width: 512pt; top: 90pt; height: 632pt;
+            }
+            @frame footer_frame {           /* Another static Frame */
+                -pdf-frame-content: footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+        body{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: 'sans-serif',Courier, monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Content for Static Frame 'header_frame' -->
+    <div id="header_content">
+        <h1>MAN Paid Publication</h1>
+    </div>
+
+    <!-- Content for Static Frame 'footer_frame' -->
+    <div id="footer_content">(c) - page <pdf:pagenumber>
+        of <pdf:pagecount>
+    </div>
+
+    <h2 style="font-size:16px;">Title: {{title}}</h2>
+    <h4 style="font-size:16px;">Name: {{name}}</h4>
+
+    <div>
+        <img src="{{image.url}}" alt="Publication Preview Image" style="height: 300px;"/>
+    </div>
+    
+    <div>
+        <h5 style="font-size:14px;">Written On: {{created_at}}</h5>
+        <h5 style="font-size:14px;">Publication Type: {{type}}</h5>
+
+        {% if details %}
+            {% for detail in details %}
+                <h3 style="font-size:16px; margin:0; padding:0;">{{detail.header}}</h3>
+                <p style="font-size:14px; margin:0; padding:0;">{{detail.value}}</p>
+            {% endfor %}
+        {% else %} 
+            <p>This publication contains no details</p>
+        {% endif %}
+
+        <a href="{{link}}" style="font-size:16px; font-weight:700; margin-top:20px;">Read more or download link</a>
+    </div>
+</body>
+
+</html>

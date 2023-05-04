@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Service Mail</title>
+  </head>
+  <body>
+    <h1>Hello {{client_mail}}</h1>
+    <p>
+      Please click the link below to verify your email to successfully subscribe
+      to our man newsletter.
+    </p>
+    <p>
+      <strong>NOTE:</strong>
+      This link will expire after 7 days counting from the time of receiving it
+    </p>
+    <div>
+      <a href="{{redirect_url}}" class="btn">Yes this is my email</a>
+    </div>
+  </body>
+</html>

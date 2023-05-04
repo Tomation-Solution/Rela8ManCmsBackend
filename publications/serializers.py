@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import exceptions
-from publications.models import Publication, PublicationParagraph
+from publications.models import Publication, PublicationType
 
 
 class PublicationParagraphSerializer(serializers.Serializer):
@@ -79,7 +79,6 @@ class PublicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Publication
-        # fields = "__all__"
         exclude = ["writer"]
 
 
@@ -87,4 +86,11 @@ class PublicationSerializerPaid(serializers.ModelSerializer):
 
     class Meta:
         model = Publication
-        fields = ["id", "name", "title","price","image"]
+        fields = ["id", "name", "title", "price", "image"]
+
+
+class PublicationTypeSerializer(serializers.Serializer):
+
+    class Meta:
+        model = PublicationType
+        exclude = ["writer"]
