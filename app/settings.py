@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "corsheaders",
     'cloudinary_storage',
     'cloudinary',
-     "anymail",
     # user defined apps
     'authentication',
     "publications",
@@ -58,12 +57,17 @@ INSTALLED_APPS = [
     "services",
     "membership",
     "structure",
-   
+    "payments",
+    # MAILING
+    "anymail",
+
 ]
 
-CORS_ALLOWED_ORIGINS = os.environ.get("TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
 
-CSRF_TRUSTED_ORIGINS = os.environ.get("TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -131,7 +135,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -150,7 +154,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = dict()
-DATABASE_URL = os.environ.get('DATABASE_URL',None)
+DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
 if not DATABASE_URL:
     DATABASES = {
@@ -213,7 +217,7 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -225,19 +229,29 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#SENDIN BLUE MAILING SERVICES
-SENDAPIKEY = os.environ.get("SENDINBLUE_KEY")
 
-ANYMAIL = {
-    "SENDINBLUE_API_KEY": SENDAPIKEY,
-}
+# SENDIN BLUE MAILING SERVICES
+# EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
 
-EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
+# ANYMAIL = {
+#     "SENDINBLUE_API_KEY": os.environ.get("SENDINBLUE_KEY"),
+#     "SENDINBLUE_API_URL": "https://api.sendinblue.com/v3"
+# }
 
+# might use this later leave here
+# EMAIL_HOST = "smtp-relay.sendinblue.com"
+# SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER')
+# DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
 
-SENDINBLUE_API_URL = "https://api.sendinblue.com/v3/"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# MAILING SETUP
+EMAIL_USE_TLS = True
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')  # if you don't already have this in settings
-SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER')  # ditto (default from-email for Django errors)
+PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY")
+PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY")
 
-
+# git push -m"update: payments app added, updated the models for trainings and events"

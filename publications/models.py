@@ -3,6 +3,14 @@ from authentication.models import User
 # Create your models here.
 
 
+class PublicationType(models.Model):
+    writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=300, blank=False)
+
+    def __str__(self) -> str:
+        return f"Type of publication {self.id}"
+
+
 class Publication(models.Model):
     TYPES = [
         ("MCCI", "MCCI"),
@@ -28,12 +36,3 @@ class Publication(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-
-
-class PublicationParagraph(models.Model):
-    publication = models.ForeignKey(to=Publication, on_delete=models.CASCADE)
-    header = models.TextField(default=' ', null=True, blank=True)
-    value = models.TextField(default=' ', null=True, blank=True)
-
-    def __str__(self) -> str:
-        return f"publication: {str(self.publication)} || paragraph: {self.pk}"

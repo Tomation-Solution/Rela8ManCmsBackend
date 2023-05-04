@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Email Account</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,latin-ext"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <style>
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #2b3513;
+        overflow: hidden;
+        padding: 30px;
+        font-family: 'Roboto', sans-serif ,Courier, monospace;
+      }
+      img {
+        width: 100px;
+        height: 100px
+        object-fit: contain;
+      }
+      .card {
+        border: 1px solid #fff;
+        padding: 30px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .card h1 {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <img
+        src="https://man-new-test-site.netlify.app/static/media/manlogo2.885828f3a860b0e9a59c.png"
+        alt="MAN LOGO"
+      />
+      <h1>{{message}}</h1>
+    </div>
+  </body>
+</html>

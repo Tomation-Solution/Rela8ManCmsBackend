@@ -26,6 +26,7 @@ class MPDCL(models.Model):
     who_we_are = models.JSONField()
     our_objectives_header = models.TextField()
     our_objectives_items = models.JSONField() #array
+    renewable_image = models.ImageField(default=None, blank=True, null=True)
     renewable_desc = models.JSONField()
     renewable_items = models.JSONField() #array{header, description}
 

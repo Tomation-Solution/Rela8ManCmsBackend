@@ -1,9 +1,9 @@
-from django.shortcuts import render
 from rest_framework import generics, permissions
-from publications.models import Publication
-from publications.serializers import PublicationSerializer, PublicationSerializerPaid
+from publications.models import Publication, PublicationType
+from publications.serializers import PublicationSerializer, PublicationSerializerPaid, PublicationTypeSerializer
 from rest_framework.parsers import FormParser
 from utils import custom_parsers, custom_response
+
 # Create your views here.
 
 
@@ -36,7 +36,33 @@ class PublicationDatialView(generics.RetrieveUpdateDestroyAPIView):
         return self.queryset.filter(writer=self.request.user)
 
 
+class PublicationTypeView(generics.ListCreateAPIView):
+    serializer_class = PublicationTypeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return PublicationType.objects.all()
+
+    def perform_create(self, serializer):
+        return serializer.save(writer=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return custom_response.Success_response(msg="all publication types", data=serializer.data)
+
+
+class PublicationTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PublicationTypeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return PublicationType.objects.filter(writer=self.request.user)
+
 # PUBLIC CLASS HERE
+
+
 class PublicationViewPublic(generics.ListAPIView):
     serializer_class = PublicationSerializer
 
@@ -49,13 +75,14 @@ class PublicationViewPublic(generics.ListAPIView):
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(data=serializer.data, msg="free publications")
 
+
 class PublicationViewPaidPublic(generics.ListAPIView):
     serializer_class = PublicationSerializerPaid
 
     def get_queryset(self):
         queryset = Publication.objects.filter(is_paid=True)
         return queryset
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)

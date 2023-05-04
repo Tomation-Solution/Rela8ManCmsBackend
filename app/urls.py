@@ -22,7 +22,7 @@ urlpatterns = [
     path('api/auth/', include("authentication.urls")),  # done done
     path("api/publications/", include("publications.urls")),  # done done
     path("api/news/", include("news.urls")),  # done done
-    path("api/gallery/", include("gallery.urls")), # done done
+    path("api/gallery/", include("gallery.urls")), # done
     path("api/reports/", include("reports.urls")),  # done done
     path("api/events/", include("events.urls")),  # done done
     path("api/trainings/", include("trainings.urls")),  # done done
@@ -30,4 +30,5 @@ urlpatterns = [
     path("api/services/", include("services.urls")), # done done
     path("api/membership/", include("membership.urls")),  # done done
     path("api/structure/", include("structure.urls")),
+    path("api/payments/", include("payments.urls")),
 ]

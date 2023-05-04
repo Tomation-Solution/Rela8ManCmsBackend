@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, parsers, exceptions, status
-from structure.models import SectoralGroup, MRC, MRCServices, MPDCL
-from structure.serializers import SectoralGroupSerializer, MRCSerializer, MRCServicesSerializer, MPDCLSerializer
+from structure.models import SectoralGroup, MRC, MRCServices, MPDCL, MPDCLServices
+from structure.serializers import SectoralGroupSerializer, MRCSerializer, MRCServicesSerializer, MPDCLSerializer, MPDCLServicesSerializer
 from utils import custom_response, custom_parsers, custom_permissions
 
 # Create your views here.
@@ -80,6 +80,7 @@ class MRCServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
 class MPDCLView(generics.GenericAPIView):
     serializer_class = MPDCLSerializer
     permission_classes = [custom_permissions.IsGetRequestOrAuthenticated]
+    parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
 
     def get(self, request):
         try:
@@ -102,12 +103,12 @@ class MPDCLView(generics.GenericAPIView):
         return custom_response.Success_response(msg="mpdcl data", data=serializer.data)
 
 class MPDCLServicesView(generics.ListCreateAPIView):
-    serializer_class = MPDCLSerializer
+    serializer_class = MPDCLServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
 
     def get_queryset(self):
-        return MPDCL.objects.all()
+        return MPDCLServices.objects.all()
     
     def perform_create(self, serializer):
         return serializer.save(writer=self.request.user)
@@ -118,13 +119,13 @@ class MPDCLServicesView(generics.ListCreateAPIView):
         return custom_response.Success_response(msg="mpdcl service", data=serializer.data)
 
 class MPDCLServicesDetialView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = MPDCLSerializer
+    serializer_class = MPDCLServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
     lookup_field = "id"
 
     def get_queryset(self):
-        return MPDCL.objects.filter(writer = self.request.user)
+        return MPDCLServices.objects.filter(writer = self.request.user)
 
 #PUBLIC VIEWS
 class SectoralGroupPublicView(generics.ListAPIView):
@@ -150,10 +151,10 @@ class MRCServicePublicView(generics.ListAPIView):
         return custom_response.Success_response(msg="mrc service", data=serializer.data)
     
 class MPDCLServicesPublicView(generics.ListAPIView):
-    serializer_class = MPDCLSerializer
+    serializer_class = MPDCLServicesSerializer
 
     def get_queryset(self):
-        return MPDCL.objects.all()
+        return MPDCLServices.objects.all()
     
     def list(self, request):
         queryset = self.get_queryset()
