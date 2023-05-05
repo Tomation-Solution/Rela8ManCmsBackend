@@ -1,2 +1,1 @@
-release: chmod u+x release.sh && ./release.sh
-web: gunicorn app.wsgi:application 
+web: chmod u+x release.sh && ./release.sh  && gunicorn app.wsgi:application 
