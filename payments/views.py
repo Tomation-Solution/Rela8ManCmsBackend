@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 
 from utils.html2pdf import render_to_pdf
 
@@ -56,10 +55,6 @@ def paystack_webhook(request, pk=None):
 
                 html_message = render_to_string('GetFile.html', {
                                                 'purchase_download_url': absUrl, 'client_mail': payment.email, "purchase_item": purchase_item, "purchase_view_url": viewUrl})
-                plain_message = strip_tags(html_message)
-
-                data = {"email_stripped_tags": plain_message, "email_with_tags": html_message,
-                        "email_subject": email_subject, "to": payment.email}
 
                 # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
                 payment = get_object_or_404(
@@ -68,7 +63,8 @@ def paystack_webhook(request, pk=None):
                 payment.save()
 
                 # my send mail utility class
-                mailer.Utils.send_html_mail(data)
+                mailer.sib_send_mail(to=[{"email": payment.email, "name": payment.fullname}],
+                                     html_content=html_message, subject=email_subject)
 
             if meta_data["forWhat"] in ("event_purchase", "training_purchase"):
                 reference_num = payload['data']['reference']
@@ -141,12 +137,10 @@ class EventTrainingRegistrationView(generics.GenericAPIView):
 
         html_message = render_to_string('EventTrainingRegistration.html', {
                                         'ref_no': registation_obj["ref"], 'client_mail': registation_obj["email"], 'registration_name': registation_obj['event_training_name'], 'type': registation_obj["type"]})
-        plain_message = strip_tags(html_message)
 
-        data = {"email_stripped_tags": plain_message, "email_with_tags": html_message,
-                "email_subject": email_subject, "to": registation_obj["email"]}
         # my send mail utility class
-        mailer.Utils.send_html_mail(data)
+        mailer.sib_send_mail(to=[{"email": registation_obj["email"], "name": registation_obj["fullname"]}],
+                             html_content=html_message, subject=email_subject)
 
         return custom_response.Success_response(msg="event or training registration", data=serializer.data)
 

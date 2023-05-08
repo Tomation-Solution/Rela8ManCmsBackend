@@ -16,9 +16,12 @@ class GallerySerializer(serializers.ModelSerializer):
 
     def get_gallery_images(self, instance):
         gallery_images = GalleryItems.objects.filter(
-            gallery=instance).values("id", "caption", "image")
-        print(instance)
-        return gallery_images
+            gallery=instance)
+        list_of_images = []
+        for i in gallery_images:
+            list_of_images.append(
+                {"id": i.id, "caption": i.caption, "image": i.image.url})
+        return list_of_images
 
     def create(self, validated_data):
         list_of_images = validated_data.pop("images", [])
@@ -29,24 +32,6 @@ class GallerySerializer(serializers.ModelSerializer):
                 "caption"), image=item.get("image"))
 
         return gallery
-
-    # def update(self, instance, validated_data):
-    #     if "images" in validated_data:
-    #         images = validated_data.get("images")
-    #         for item in images:
-    #             item_id = item.get("id", None)
-    #             gallery_item, created = GalleryItems.objects.get_or_create(
-    #                 gallery=instance, id=item_id)
-    #             gallery_item.caption = item.get(
-    #                 "caption", gallery_item.caption)
-    #             gallery_item.image = item.get(
-    #                 "image", gallery_item.image)
-
-    #             gallery_item.save()
-
-    #         return instance
-
-    #     return super(GallerySerializer, self).update(instance, validated_data)
 
     class Meta:
         model = Gallery
@@ -60,6 +45,8 @@ class GalleryRenameSerializer(serializers.Serializer):
 class GalleryItemSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(required=True)
     image = Base64ImageField(required=True)
+    gallery = serializers.PrimaryKeyRelatedField(
+        queryset=Gallery.objects.all(), allow_null=False, required=False)
 
     class Meta:
         model = GalleryItems
