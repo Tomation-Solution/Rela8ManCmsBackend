@@ -5,18 +5,12 @@ from authentication.models import User
 
 
 class Training(models.Model):
-    training_type_choices = [
-        ("MRC", "MRC"),
-        ("MPDCL", "MPDCL"),
-        ("OTHERS", "OTHERS")
-    ]
 
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(
         upload_to='images/trainings/', blank=True, null=True)
     name = models.CharField(max_length=300)
-    training_type = models.CharField(
-        blank=False, choices=training_type_choices, max_length=100)
+    training_type = models.CharField(blank=False, max_length=100)
     # THE GROUP OR SECTION THE TRAINING IS FOR
     group_type = models.CharField(max_length=300)
     location = models.TextField()

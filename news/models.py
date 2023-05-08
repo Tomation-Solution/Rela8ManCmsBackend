@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 # Create your models here.
 
 
@@ -13,7 +14,8 @@ class News(models.Model):
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300)
     details = models.JSONField()
-    link = models.URLField(max_length=200)
+    link = models.FileField(upload_to='documents/news/%d/', null=True, default=None,
+                            storage=RawMediaCloudinaryStorage())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -156,6 +156,13 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = dict()
 DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 if not DATABASE_URL:
     DATABASES = {
         'default': {
@@ -213,7 +220,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -231,25 +238,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # SENDIN BLUE MAILING SERVICES
+SENDINBLUE_API_KEY = os.environ.get("SENDINBLUE_KEY")
+
 # EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
 
-# ANYMAIL = {
-#     "SENDINBLUE_API_KEY": os.environ.get("SENDINBLUE_KEY"),
-#     "SENDINBLUE_API_URL": "https://api.sendinblue.com/v3"
-# }
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
+DEFAULT_FROM_NAME = os.environ.get('EMAIL_HOST_NAME')
 
-# might use this later leave here
-# EMAIL_HOST = "smtp-relay.sendinblue.com"
-# SERVER_EMAIL = os.environ.get('EMAIL_HOST_USER')
-# DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# MAILING SETUP
-EMAIL_USE_TLS = True
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
-PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY")
-PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL

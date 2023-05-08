@@ -56,11 +56,28 @@ class GalleryItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        gallery = Gallery.objects.get(writer=self.request.user)
-        return GalleryItems.objects.filter(gallery=gallery)
+        return GalleryItems.objects.all()
+
+
+class GalleryAddGalleryItem(generics.GenericAPIView):
+    serializer_class = GalleryItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        body = request.data
+        if len(request.data["image"]) <= 0 or len(request.data["caption"]) <= 0:
+            return custom_response.Response(data={"message": "invalid image"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.serializer_class(data=body)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return custom_response.Success_response("gallery item added", data=serializer.data)
 
 
 # PUBLIC CLASS HERE
+
+
 class GalleryViewPublic(generics.ListAPIView):
     serializer_class = GallerySerializer
 

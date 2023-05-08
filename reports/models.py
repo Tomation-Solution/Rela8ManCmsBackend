@@ -6,6 +6,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 # Create your models here.
 
 
@@ -15,7 +16,8 @@ class Reports(models.Model):
         upload_to='images/reports/', blank=True, null=True, default=None)
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300)
-    link = models.URLField(max_length=200)
+    link = models.FileField(upload_to='documents/reports/%d/', null=True, default=None,
+                            storage=RawMediaCloudinaryStorage())
     details = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

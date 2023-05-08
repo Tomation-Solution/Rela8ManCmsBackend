@@ -17,6 +17,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         max_digits=10, decimal_places=2, default=0.00, required=False)
 
     image = serializers.ImageField(required=False)
+    link = serializers.FileField(required=False)
 
     def validate(self, attrs):
         is_paid = attrs.get("is_paid", "")
@@ -89,7 +90,7 @@ class PublicationSerializerPaid(serializers.ModelSerializer):
         fields = ["id", "name", "title", "price", "image"]
 
 
-class PublicationTypeSerializer(serializers.Serializer):
+class PublicationTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PublicationType

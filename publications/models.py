@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 # Create your models here.
 
 
@@ -12,19 +13,15 @@ class PublicationType(models.Model):
 
 
 class Publication(models.Model):
-    TYPES = [
-        ("MCCI", "MCCI"),
-        ("MAGAZINE", "MAGAZINE"),
-        ("OTHERS", "OTHERS")
-    ]
-
-    type = models.CharField(choices=TYPES, max_length=255)
+    type = models.ForeignKey(
+        to=PublicationType, on_delete=models.SET_NULL, null=True)
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(
         upload_to='images/publications/', blank=True, null=True, default=None)
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300)
-    link = models.URLField(max_length=200)
+    link = models.FileField(upload_to='documents/publications/', null=True, default=None,
+                            storage=RawMediaCloudinaryStorage())
     details = models.JSONField()
     is_paid = models.BooleanField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)

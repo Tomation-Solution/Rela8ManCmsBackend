@@ -13,6 +13,7 @@ from django.utils.html import strip_tags
 from django.shortcuts import render
 # Create your views here.
 
+
 class RequestServiceView(generics.GenericAPIView):
     serializer_class = RequestServiceSerializer
     permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
@@ -49,19 +50,18 @@ class RequestServiceView(generics.GenericAPIView):
         # redirect to our verify-email view
         relativePath = reverse("verify-request")
 
-        absUrl = "http://"+current_site+relativePath+"?token="+str(token)+"&ref="+str(ref_no)
+        absUrl = "http://"+current_site+relativePath + \
+            "?token="+str(token)+"&ref="+str(ref_no)
         email_subject = "Service Request Email Verification"
 
-        html_message = render_to_string('RequestServiceMail.html', {'redirect_url': absUrl, 'client_mail':request_obj["email"]})
-        plain_message = strip_tags(html_message)
+        html_message = render_to_string('RequestServiceMail.html', {
+                                        'redirect_url': absUrl, 'client_mail': request_obj["email"]})
 
-        data = {"email_stripped_tags": plain_message,"email_with_tags":html_message,
-                "email_subject": email_subject, "to": request_obj["email"]}
         # my send mail utility class
-        mailer.Utils.send_html_mail(data)
-        
+        mailer.sib_send_mail(to=[{"email": request_obj["email"], "name":request_obj["email"]}],
+                             html_content=html_message, subject=email_subject)
+
         return custom_response.Success_response(msg="mail successfully sent", data=request_serialized)
-    
 
 
 class VerifyServiceRequestEmailView(generics.GenericAPIView):
@@ -77,15 +77,15 @@ class VerifyServiceRequestEmailView(generics.GenericAPIView):
             if not serviceRequest.is_verified:
                 serviceRequest.is_verified = True
                 serviceRequest.save()
-                return render(request,"ConfirmationPage.html", context={'message': 'service request email verified'})
-            return render(request,"ConfirmationPage.html", context={'message': 'service request email verified'})
+                return render(request, "ConfirmationPage.html", context={'message': 'service request email verified'})
+            return render(request, "ConfirmationPage.html", context={'message': 'service request email verified'})
 
         except jwt.ExpiredSignatureError as err:
-            return render(request,"ConfirmationPage.html", context={'message': 'Activation Token Expired'})
+            return render(request, "ConfirmationPage.html", context={'message': 'Activation Token Expired'})
         except jwt.exceptions.DecodeError as err:
-            return render(request,"ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
+            return render(request, "ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
         except:
-            return render(request,"ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
+            return render(request, "ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
 
 
 class SubscribeToNewsLetterVIew(generics.GenericAPIView):
@@ -93,7 +93,7 @@ class SubscribeToNewsLetterVIew(generics.GenericAPIView):
     permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
 
     def get_queryset(self):
-        return SubscribeToNewsLetter.objects.filter(is_verified = True)
+        return SubscribeToNewsLetter.objects.filter(is_verified=True)
 
     def get(self, request):
         queryset = self.get_queryset()
@@ -119,19 +119,19 @@ class SubscribeToNewsLetterVIew(generics.GenericAPIView):
         ref_no = request_obj['ref']
 
         current_site = get_current_site(request).domain
-        
+
         relativePath = reverse("newsletter-email-verification")
 
-        absUrl = "http://"+current_site+relativePath+"?token="+str(token)+"&ref="+str(ref_no)
+        absUrl = "http://"+current_site+relativePath + \
+            "?token="+str(token)+"&ref="+str(ref_no)
         email_subject = "MAN newsletter email verification"
 
-        html_message = render_to_string('NewLetterSubscriptionMail.html', {'redirect_url': absUrl, 'client_mail':request_obj["email"]})
-        plain_message = strip_tags(html_message)
+        html_message = render_to_string('NewLetterSubscriptionMail.html', {
+                                        'redirect_url': absUrl, 'client_mail': request_obj["email"]})
 
-        data = {"email_stripped_tags": plain_message,"email_with_tags":html_message,
-                "email_subject": email_subject, "to": request_obj["email"]}
         # my send mail utility class
-        mailer.Utils.send_html_mail(data)
+        mailer.sib_send_mail(to=[{"email": request_obj["email"], "name":request_obj["email"]}],
+                             html_content=html_message, subject=email_subject)
 
         return custom_response.Success_response(msg="mail successfully sent", data=request_serialized)
 
@@ -149,16 +149,16 @@ class VerifyNewsletterEmailView(generics.GenericAPIView):
             if not newLetterSubscription.is_verified:
                 newLetterSubscription.is_verified = True
                 newLetterSubscription.save()
-                return render(request,"ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
-            
-            return render(request,"ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
+                return render(request, "ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
+
+            return render(request, "ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
 
         except jwt.ExpiredSignatureError as err:
-            return render(request,"ConfirmationPage.html", context={'message': 'Activation Token Expired'})
+            return render(request, "ConfirmationPage.html", context={'message': 'Activation Token Expired'})
         except jwt.exceptions.DecodeError as err:
-            return render(request,"ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
+            return render(request, "ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
         except:
-            return render(request,"ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
+            return render(request, "ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
 
 
 class AllServicesView(generics.ListCreateAPIView):

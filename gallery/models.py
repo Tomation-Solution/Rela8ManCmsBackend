@@ -11,7 +11,7 @@ class Gallery(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.name} || {self.id}"
 
     class Meta:
         ordering = ["-created_at"]
@@ -22,3 +22,6 @@ class GalleryItems(models.Model):
     caption = models.CharField(max_length=300)
     image = models.ImageField(
         upload_to='images/gallery/', blank=False, null=False)
+
+    def __str__(self) -> str:
+        return f"gallery item || {self.id}"
