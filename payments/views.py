@@ -21,7 +21,6 @@ from utils.html2pdf import render_to_pdf
 
 # Create your views here.
 
-
 @csrf_exempt
 def paystack_webhook(request, pk=None):
     payload = json.loads(request.body)
@@ -56,15 +55,15 @@ def paystack_webhook(request, pk=None):
                 html_message = render_to_string('GetFile.html', {
                                                 'purchase_download_url': absUrl, 'client_mail': payment.email, "purchase_item": purchase_item, "purchase_view_url": viewUrl})
 
+                # my send mail utility class
+                mailer.sib_send_mail(to=[{"email": payment.email, "name": payment.fullname}],
+                                     html_content=html_message, subject=email_subject)
+
                 # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
                 payment = get_object_or_404(
                     PublicationPayment, ref=reference_num)
                 payment.file_received = True
                 payment.save()
-
-                # my send mail utility class
-                mailer.sib_send_mail(to=[{"email": payment.email, "name": payment.fullname}],
-                                     html_content=html_message, subject=email_subject)
 
             if meta_data["forWhat"] in ("event_purchase", "training_purchase"):
                 reference_num = payload['data']['reference']
@@ -207,7 +206,7 @@ class PublicationPaymentView(generics.GenericAPIView):
         reason_for_payment = "publication_purchase"
 
         return initialize_payment(reason_for_payment=reason_for_payment,
-                                  amount=publication_amount, buyer_obj=buyer_obj)
+                                  amount=publication_amount, buyer_obj=buyer_obj, callback_url="https://man-new-test-site.netlify.app/paid-publications")
 
 
 class ViewPublicationPDF(generics.GenericAPIView):
@@ -225,8 +224,10 @@ class ViewPublicationPDF(generics.GenericAPIView):
         )
         created_at = Publication.objects.get(
             pk=publication_payment.publication.pk).created_at.date()
+        read_more_link = Publication.objects.get(
+            pk=publication_payment.publication.pk).link.url
 
-        pdf = render_to_pdf('PublicationHtml2Pdf.html', {
+        pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
                             "created_at": created_at, **publication})
         return HttpResponse(pdf, content_type='application/pdf')
 
@@ -246,8 +247,10 @@ class DownloadPublicationPDF(generics.GenericAPIView):
         )
         created_at = Publication.objects.get(
             pk=publication_payment.publication.pk).created_at.date()
+        read_more_link = Publication.objects.get(
+            pk=publication_payment.publication.pk).link.url
 
-        pdf = render_to_pdf('PublicationHtml2Pdf.html', {
+        pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
                             "created_at": created_at, **publication})
 
         response = HttpResponse(pdf, content_type='application/pdf')
