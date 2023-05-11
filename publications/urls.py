@@ -12,4 +12,5 @@ urlpatterns = [
          name="publication-public"),
     path("public/paid-publication",
          views.PublicationViewPaidPublic.as_view(), name="paid_publications"),
+    path("type/public", views.PublicationTypePublicView.as_view(), name="type-public"),
 ]

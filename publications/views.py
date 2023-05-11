@@ -87,3 +87,15 @@ class PublicationViewPaidPublic(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(data=serializer.data, msg="paid publications")
+
+
+class PublicationTypePublicView(generics.ListAPIView):
+    serializer_class = PublicationTypeSerializer
+
+    def get_queryset(self):
+        return PublicationType.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return custom_response.Success_response(data=serializer.data, msg="publication type")
