@@ -218,17 +218,18 @@ class ViewPublicationPDF(generics.GenericAPIView):
         ref = request.GET.get("ref")
 
         publication_payment = get_object_or_404(PublicationPayment, ref=ref)
-        publication = model_to_dict(
-            Publication.objects.get(
-                pk=publication_payment.publication.pk)
-        )
-        created_at = Publication.objects.get(
-            pk=publication_payment.publication.pk).created_at.date()
-        read_more_link = Publication.objects.get(
-            pk=publication_payment.publication.pk).link.url
+        publication_obj = Publication.objects.get(
+            pk=publication_payment.publication.pk)
+        publication = model_to_dict(publication_obj)
+
+        created_at = publication_obj.created_at.date()
+
+        read_more_link = publication_obj.link.url
+
+        publications_type = publication_obj.type.name
 
         pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
-                            "created_at": created_at, **publication})
+                            "created_at": created_at, "publications_type": publications_type, **publication})
         return HttpResponse(pdf, content_type='application/pdf')
 
 
@@ -241,17 +242,18 @@ class DownloadPublicationPDF(generics.GenericAPIView):
         ref = request.GET.get("ref")
 
         publication_payment = get_object_or_404(PublicationPayment, ref=ref)
-        publication = model_to_dict(
-            Publication.objects.get(
-                pk=publication_payment.publication.pk)
-        )
-        created_at = Publication.objects.get(
-            pk=publication_payment.publication.pk).created_at.date()
-        read_more_link = Publication.objects.get(
-            pk=publication_payment.publication.pk).link.url
+        publication_obj = Publication.objects.get(
+            pk=publication_payment.publication.pk)
+        publication = model_to_dict(publication_obj)
+
+        created_at = publication_obj.created_at.date()
+
+        read_more_link = publication_obj.link.url
+
+        publications_type = publication_obj.type.name
 
         pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
-                            "created_at": created_at, **publication})
+                            "created_at": created_at, "publications_type": publications_type, **publication})
 
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Publication_%s.pdf" % (f"{publication['name']}")
