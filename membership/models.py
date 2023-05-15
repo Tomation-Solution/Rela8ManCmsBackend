@@ -59,8 +59,9 @@ class HomePage(models.Model):
     def __str__(self) -> str:
         return f"Home page main: {self.id}"
 
+
 class WhyWeAreUnique(models.Model):
-    writer = models.OneToOneField(
+    writer = models.ForeignKey(
         to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(default=None, blank=True, null=True)
     heading = models.CharField(max_length=300)
@@ -68,6 +69,7 @@ class WhyWeAreUnique(models.Model):
 
     def __str__(self) -> str:
         return f"why we are unique {self.id}"
+
 
 class OurMembers(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
