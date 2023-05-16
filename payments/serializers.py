@@ -1,6 +1,6 @@
 import secrets
 from rest_framework import serializers, exceptions
-from payments.models import PublicationPayment, EventTrainingRegistration, AGMRegistration
+from payments.models import PublicationPayment, EventTrainingRegistration
 from publications.models import Publication
 from events.models import Event
 from trainings.models import Training
@@ -93,47 +93,3 @@ class EventTrainingRegistrationSerializer(serializers.ModelSerializer):
             **validated_data)
 
         return registration
-
-
-class AGMParticipantVerification(serializers.Serializer):
-    designation_choices = [
-        ("memeber", "memeber"),
-        ("exhibitor", "exhibitor"),
-        ("exhibitor-participant", "exhibitor-participant"),
-        ("guest", "guest"),
-        ("media", "media"),
-        ("staff", "staff"),
-    ]
-
-    name = serializers.CharField(required=True)
-    designation = serializers.ChoiceField(
-        required=True, choices=designation_choices)
-    email = serializers.EmailField(required=True)
-    phone_no = serializers.CharField(required=True)
-
-
-class AGMRegistrationSerailizer(serializers.ModelSerializer):
-    event = serializers.PrimaryKeyRelatedField(
-        allow_null=False, required=True, queryset=Event.objects.filter(is_agm=True))
-    participant_details = AGMParticipantVerification(
-        many=True, required=True, allow_empty=False)
-
-    class Meta:
-        model = AGMRegistration
-        fields = "__all__"
-        read_only_fields = ["ref", "amount_to_pay"]
-
-    def create(self, validated_data):
-        while True:
-            ref = secrets.token_urlsafe(50)
-            object_with_similar_ref = AGMRegistration.objects.filter(
-                ref=ref).exists()
-            if not object_with_similar_ref:
-                validated_data["ref"] = ref
-                break
-
-        event_price = validated_data.get("event", "").price
-        validated_data["amount_to_pay"] = event_price
-
-        agm_registration = AGMRegistration.objects.create(**validated_data)
-        return agm_registration
