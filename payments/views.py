@@ -1,13 +1,10 @@
-import datetime
-from django.conf import settings
 from django.forms import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-import requests
 import json
 from publications.models import Publication
-from payments.models import PublicationPayment, EventTrainingRegistration, AGMRegistration
-from payments.serializers import PublicationPaymentSerailzer, EventTrainingRegistrationSerializer, AGMRegistrationSerailizer
+from payments.models import PublicationPayment, EventTrainingRegistration, MembersAGMRegistration, ExhibitorsAGMRegistration
+from payments.serializers import PublicationPaymentSerailzer, EventTrainingRegistrationSerializer
 from utils import custom_permissions, custom_response, mailer
 from utils.extras import initialize_payment
 from rest_framework import generics
@@ -65,27 +62,56 @@ def paystack_webhook(request, pk=None):
                 payment.file_received = True
                 payment.save()
 
-            if meta_data["forWhat"] in ("event_purchase", "training_purchase"):
-                reference_num = payload['data']['reference']
-                amount_paid = payload['data']['amount']
-                payment = get_object_or_404(
-                    EventTrainingRegistration, ref=reference_num)
-                amount_to_pay = int(float(payment.amount_to_pay))*100
+        if meta_data["forWhat"] in ("event_purchase", "training_purchase"):
+            reference_num = payload['data']['reference']
+            amount_paid = payload['data']['amount']
+            payment = get_object_or_404(
+                EventTrainingRegistration, ref=reference_num)
+            amount_to_pay = int(float(payment.amount_to_pay))*100
 
-                if amount_to_pay == amount_paid:
-                    payment.is_verified = True
-                    payment.save()
+            if amount_to_pay == amount_paid:
+                payment.is_verified = True
+                payment.save()
 
-            if meta_data["forWhat"] == "agm_purchase":
-                reference_num = payload['data']['reference']
-                amount_paid = payload['data']['amount']
-                payment = get_object_or_404(
-                    AGMRegistration, ref=reference_num)
-                amount_to_pay = int(float(payment.amount_to_pay))*100
+        if meta_data["forWhat"] == "member_agm_purchase":
+            reference_num = payload['data']['reference']
+            amount_paid = payload['data']['amount']
+            payment = get_object_or_404(
+                MembersAGMRegistration, ref=reference_num)
+            amount_to_pay = int(float(payment.amount_to_pay))*100
 
-                if amount_to_pay == amount_paid:
-                    payment.is_verified = True
-                    payment.save()
+            if amount_to_pay == amount_paid:
+                payment.is_verified = True
+                payment.save()
+
+            email_subject = f"Registration for Annual General Meeting"
+
+            html_message = render_to_string('EventTrainingRegistration.html', {
+                                            'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event as a member", 'type': "Event"})
+
+            # my send mail utility class
+            mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
+                                 html_content=html_message, subject=email_subject)
+
+        if meta_data["forWhat"] == "exhibitor_agm_purchase":
+            reference_num = payload['data']['reference']
+            amount_paid = payload['data']['amount']
+            payment = get_object_or_404(
+                ExhibitorsAGMRegistration, ref=reference_num)
+            amount_to_pay = int(float(payment.amount_to_pay))*100
+
+            if amount_to_pay == amount_paid:
+                payment.is_verified = True
+                payment.save()
+
+            email_subject = f"Registration for Annual General Meeting"
+
+            html_message = render_to_string('EventTrainingRegistration.html', {
+                                            'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event an exhibitor", 'type': "AGM Event"})
+
+            # my send mail utility class
+            mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
+                                 html_content=html_message, subject=email_subject)
 
     return HttpResponse(status=200)
 
@@ -142,37 +168,6 @@ class EventTrainingRegistrationView(generics.GenericAPIView):
                              html_content=html_message, subject=email_subject)
 
         return custom_response.Success_response(msg="event or training registration", data=serializer.data)
-
-
-class AGMRegistrationView(generics.GenericAPIView):
-    serializer_class = AGMRegistrationSerailizer
-    permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
-
-    def get_queryset(self):
-        return AGMRegistration.objects.all()
-
-    def get(self, request):
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="all AGM registrations", data=serializer.data)
-
-    def post(self, request):
-        body = request.data
-        serializer = self.serializer_class(data=body)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        agm_registration = AGMRegistration.objects.get(
-            email=serializer.data["email"], ref=serializer.data["ref"])
-
-        payment_amount = agm_registration.event.price
-
-        buyer_obj = model_to_dict(agm_registration)
-
-        reason_for_payment = "agm_purchase"
-
-        return initialize_payment(reason_for_payment=reason_for_payment,
-                                  amount=payment_amount, buyer_obj=buyer_obj)
 
 
 class PublicationPaymentView(generics.GenericAPIView):

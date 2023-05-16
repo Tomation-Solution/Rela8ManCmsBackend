@@ -9,7 +9,6 @@ from django.urls import reverse
 import jwt
 from django.forms.models import model_to_dict
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.shortcuts import render
 # Create your views here.
 
