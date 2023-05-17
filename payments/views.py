@@ -93,6 +93,12 @@ def paystack_webhook(request, pk=None):
             mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
                                  html_content=html_message, subject=email_subject)
 
+            # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
+            payment = get_object_or_404(
+                MembersAGMRegistration, ref=reference_num)
+            payment.mail_recevied = True
+            payment.save()
+
         if meta_data["forWhat"] == "exhibitor_agm_purchase":
             reference_num = payload['data']['reference']
             amount_paid = payload['data']['amount']
@@ -112,6 +118,12 @@ def paystack_webhook(request, pk=None):
             # my send mail utility class
             mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
                                  html_content=html_message, subject=email_subject)
+
+            # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
+            payment = get_object_or_404(
+                ExhibitorsAGMRegistration, ref=reference_num)
+            payment.mail_recevied = True
+            payment.save()
 
     return HttpResponse(status=200)
 

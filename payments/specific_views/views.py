@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions, status
 from utils import custom_response, custom_permissions, mailer
-from payments.specific_views.serializers import LuncheonSerializer, MembersAGMRegistrationSerializer, ExhibitionBootSerializer, ExhibitorsAGMRegistrationSerializer, OthersAGMRegistrationSerializer, AGMInvitationSerializer
+from payments.specific_views.serializers import LuncheonSerializer, MembersAGMRegistrationSerializer, ExhibitionBootSerializer, ExhibitorsAGMRegistrationSerializer, OthersAGMRegistrationSerializer, AGMInvitationSerializer, AGMInvitationVerificationSerializer
 from payments.models import Luncheon, MembersAGMRegistration, ExhibitionBoot, ExhibitorsAGMRegistration, OthersAGMRegistration, AGMInvitation
 from django.forms import model_to_dict
 
@@ -74,7 +74,7 @@ class MembersAGMRegistrationView(generics.GenericAPIView):
                                   amount=payment_amount, buyer_obj=buyer_obj)
 
 
-class ExhibitorsAGMRegistration(generics.GenericAPIView):
+class ExhibitorsAGMRegistrationView(generics.GenericAPIView):
     serializer_class = ExhibitorsAGMRegistrationSerializer
     permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
 
@@ -105,7 +105,7 @@ class ExhibitorsAGMRegistration(generics.GenericAPIView):
                                   amount=payment_amount, buyer_obj=buyer_obj)
 
 
-class OthersAGMRegistrationSerializer(generics.GenericAPIView):
+class OthersAGMRegistrationView(generics.GenericAPIView):
     serializer_class = OthersAGMRegistrationSerializer
     permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
 
@@ -131,11 +131,13 @@ class OthersAGMRegistrationSerializer(generics.GenericAPIView):
         email_subject = f"Registration for Annual General Meeting"
 
         html_message = render_to_string('EventTrainingRegistration.html', {
-                                        'ref_no': reg_obj["ref"], 'client_mail': reg_obj["email"], 'registration_name': f"MAN AGM event a {reg_obj['type']}", 'type': "AGM Event"})
+                                        'ref_no': reg_obj["ref"], 'client_mail': reg_obj["email"], 'registration_name': f"MAN AGM event with the title of {reg_obj['type']}", 'type': "AGM Event"})
 
         # my send mail utility class
         mailer.sib_send_mail(to=[{"email": reg_obj["email"], "name": reg_obj["company_name"]}],
                              html_content=html_message, subject=email_subject)
+
+        return custom_response.Success_response(msg='other agm registration', data=serializer.data)
 
 
 class AGMInvitationView(generics.GenericAPIView):
@@ -157,31 +159,37 @@ class AGMInvitationView(generics.GenericAPIView):
         serializer.save()
 
         invitation = AGMInvitation.objects.get(
-            ref=serializer["ref"], email=serializer["email"])
+            ref=serializer.data["ref"], email=serializer.data["email"])
         invitation_obj = model_to_dict(invitation)
 
         email_subject = f"Invitaion to MAN's Annual General Meeting"
 
         html_message = render_to_string('EventTrainingRegistration.html', {
-                                        'ref_no': invitation_obj["ref"], 'client_mail': invitation_obj["email"], 'registration_name':  {invitation_obj['type']}, 'type': "AGM Event"})
+                                        'ref_no': invitation_obj["ref"], 'client_mail': invitation_obj["email"], 'registration_name':  invitation_obj['type'], 'type': "AGM Event"})
 
         # my send mail utility class
         mailer.sib_send_mail(to=[{"email": invitation_obj["email"], "name": invitation_obj["company_name"]}],
                              html_content=html_message, subject=email_subject)
 
+        return custom_response.Success_response(msg='other agm registration', data=serializer.data)
+
 
 class AGMInvitationVerification(generics.GenericAPIView):
+    serializer_class = AGMInvitationVerificationSerializer
 
     def post(self, request):
-        try:
-            body = request.data
-            invite = AGMInvitation.objects.get(ref=body["ref"])
-            if invite.is_valid == True:
-                invite.is_valid = False
-                invite.save()
-            return custom_response.Success_response(msg={"message": "invitaion verified"})
-        except:
-            return custom_response.Response({"message": "not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        body = request.data
+        serializer = self.serializer_class(data=body)
+        if serializer.is_valid(raise_exception=True):
+            try:
+                invite = AGMInvitation.objects.get(ref=body["ref"])
+                if invite.is_valid == True:
+                    invite.is_valid = False
+                    invite.save()
+                return custom_response.Success_response(msg="invitaion verified")
+            except:
+                return custom_response.Response({"message": "not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 # PUBLIC VIEWS
 
