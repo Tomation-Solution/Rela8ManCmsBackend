@@ -15,7 +15,7 @@ class ExhibitionBootSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ExhibitionBoot
-        fields = "__all__"
+        exclude = ["writer"]
 
 
 class ParticipantVerification(serializers.Serializer):
@@ -59,6 +59,7 @@ class ExhibitorsAGMRegistrationSerializer(serializers.ModelSerializer):
         allow_null=False, required=True, queryset=Event.objects.filter(is_agm=True))
     participant = ParticipantVerification(
         many=True, required=True, allow_empty=False)
+    luncheon_covered_participants = serializers.IntegerField(required=True)
 
     class Meta:
         model = models.ExhibitorsAGMRegistration
@@ -86,7 +87,7 @@ class ExhibitorsAGMRegistrationSerializer(serializers.ModelSerializer):
             **validated_data)
 
         agm_registration = models.ExhibitorsAGMRegistration.objects.get(
-            ref=agm_registration["ref"])
+            ref=agm_registration.ref)
 
         total_boot_price = 0
 
@@ -96,6 +97,7 @@ class ExhibitorsAGMRegistrationSerializer(serializers.ModelSerializer):
                 total_boot_price = total_boot_price + boot_instance.price
                 boot_instance.is_occupied = True
                 boot_instance.rented_by = agm_registration
+                boot_instance.save()
 
         amount_to_pay = amount_to_pay + total_boot_price
 
@@ -146,3 +148,7 @@ class AGMInvitationSerializer(serializers.ModelSerializer):
 
         invitation = models.AGMInvitation.objects.create(**validated_data)
         return invitation
+
+
+class AGMInvitationVerificationSerializer(serializers.Serializer):
+    ref = serializers.CharField(required=True)

@@ -72,16 +72,13 @@ class Luncheon(models.Model):
 
 
 class MembersAGMRegistration(models.Model):
-    type_choices = [
-        ("member", "member"),
-    ]
-
     ref = models.CharField(max_length=300)
     email = models.EmailField(blank=False)
     company_name = models.CharField(max_length=300)
     company_address = models.CharField(max_length=300)
     participant = models.JSONField()
     is_verified = models.BooleanField(default=False)
+    mail_recevied = models.BooleanField(default=False)
     amount_to_pay = models.DecimalField(
         max_digits=20, decimal_places=2)  # luncheon price
     event = models.ForeignKey(
@@ -98,10 +95,6 @@ class MembersAGMRegistration(models.Model):
 
 
 class ExhibitorsAGMRegistration(models.Model):
-    type_choices = [
-        ("exhibitor", "exhibitor"),
-    ]
-
     ref = models.CharField(max_length=300)
     email = models.EmailField(blank=False)
     company_name = models.CharField(max_length=300)
@@ -113,6 +106,7 @@ class ExhibitorsAGMRegistration(models.Model):
     boot = models.JSONField()
 
     is_verified = models.BooleanField(default=False)
+    mail_recevied = models.BooleanField(default=False)
     event = models.ForeignKey(
         to=Event, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -172,6 +166,7 @@ class AGMInvitation(models.Model):
     ]
 
     type = models.CharField(max_length=200, choices=type_choices)
+    company_name = models.CharField(max_length=300)
     email = models.EmailField()
     is_valid = models.BooleanField(default=True)
     ref = models.CharField(max_length=300)
