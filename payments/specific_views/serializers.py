@@ -152,3 +152,10 @@ class AGMInvitationSerializer(serializers.ModelSerializer):
 
 class AGMInvitationVerificationSerializer(serializers.Serializer):
     ref = serializers.CharField(required=True)
+
+
+class QuickRegistrationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.QuickRegistration
+        fields = "__all__"

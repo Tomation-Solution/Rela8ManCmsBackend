@@ -1,7 +1,8 @@
 from rest_framework import generics, permissions, status
 from utils import custom_response, custom_permissions, mailer
-from payments.specific_views.serializers import LuncheonSerializer, MembersAGMRegistrationSerializer, ExhibitionBootSerializer, ExhibitorsAGMRegistrationSerializer, OthersAGMRegistrationSerializer, AGMInvitationSerializer, AGMInvitationVerificationSerializer
-from payments.models import Luncheon, MembersAGMRegistration, ExhibitionBoot, ExhibitorsAGMRegistration, OthersAGMRegistration, AGMInvitation
+from payments.specific_views.serializers import LuncheonSerializer, MembersAGMRegistrationSerializer, ExhibitionBootSerializer, ExhibitorsAGMRegistrationSerializer, OthersAGMRegistrationSerializer, AGMInvitationSerializer, AGMInvitationVerificationSerializer, QuickRegistrationSerializer
+
+from payments.models import Luncheon, MembersAGMRegistration, ExhibitionBoot, ExhibitorsAGMRegistration, OthersAGMRegistration, AGMInvitation, QuickRegistration
 from django.forms import model_to_dict
 
 from utils.extras import initialize_payment
@@ -187,9 +188,33 @@ class AGMInvitationVerification(generics.GenericAPIView):
                 if invite.is_valid == True:
                     invite.is_valid = False
                     invite.save()
-                return custom_response.Success_response(msg="invitaion verified")
+                    return custom_response.Success_response(msg="invitaion verified")
+                return custom_response.Response(msg="invalid invitation code", status=status.HTTP_401_UNAUTHORIZED)
             except:
                 return custom_response.Response({"message": "not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuickRegistrationView(generics.GenericAPIView):
+    serializer_class = QuickRegistrationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return QuickRegistration.objects.all()
+
+    def get(self, request):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return custom_response.Success_response(msg="quick registration", data=serializer.data)
+
+    def post(self, request):
+
+        body = request.data
+        serializer = self.serializer_class(data=body)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return custom_response.Success_response(msg="quick registration", data=serializer.data)
+
 
 # PUBLIC VIEWS
 

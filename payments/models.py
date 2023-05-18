@@ -173,3 +173,20 @@ class AGMInvitation(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class QuickRegistration(models.Model):
+    company_name = models.CharField(max_length=300)
+    designation = models.CharField(max_length=300)
+    name = models.CharField(max_length=300)
+    email = models.EmailField(blank=False)
+    phone_no = models.CharField(max_length=50)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"AGM Quick Registration {self.id}"
+
+    class Meta:
+        ordering = ["-created_at"]
