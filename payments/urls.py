@@ -29,7 +29,7 @@ urlpatterns = [
          name="agm-invitation"),
     path("agm-invitation-verification", specifics.AGMInvitationVerification.as_view(),
          name="agm-invitation-verification"),
-    path("quick-agm-registration", specifics.QuickRegistrationSerializer.as_view(),
+    path("quick-agm-registration", specifics.QuickRegistrationView.as_view(),
          name="quick-agm-registration"),
 
     # PUBLIC URLS

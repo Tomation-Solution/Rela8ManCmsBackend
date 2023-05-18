@@ -194,7 +194,7 @@ class AGMInvitationVerification(generics.GenericAPIView):
                 return custom_response.Response({"message": "not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class QuickRegistrationSerializer(generics.GenericAPIView):
+class QuickRegistrationView(generics.GenericAPIView):
     serializer_class = QuickRegistrationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
