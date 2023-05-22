@@ -5,12 +5,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, user_type, password=None):
         if email is None:
             raise ValueError("User should have an email")
 
         user = self.model(email=self.normalize_email(email))
         user.set_password(password)
+        user.user_type = user_type
         user.save()
 
         return user
@@ -20,6 +21,7 @@ class UserManager(BaseUserManager):
             raise ValueError("Super User must have a password")
 
         user = self.create_user(email, password)
+        user.user_type = "super_user"
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -28,10 +30,20 @@ class UserManager(BaseUserManager):
 
 
 class User(PermissionsMixin, AbstractBaseUser):
+    user_choices = [
+        ("publication_news", "publication_news"),
+        ("event_training", "event_training"),
+        ("public_view", "public_view"),
+        ("registrations_payments", "registrations_payments"),
+        ("prospective_certificates", "prospective_certificates"),
+        ("super_user", "super_user")
+    ]
+
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    user_type = models.CharField(choices=user_choices, max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
