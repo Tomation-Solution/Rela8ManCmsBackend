@@ -73,6 +73,23 @@ def paystack_webhook(request, pk=None):
                 payment.is_verified = True
                 payment.save()
 
+                registation_obj = model_to_dict(payment)
+
+                if payment.type == "EVENT":
+                    registation_obj["event_training_name"] = payment.event.name
+
+                elif payment.type == "TRAINING":
+                    registation_obj["event_training_name"] = payment.training.name
+
+                email_subject = f"Registration for {registation_obj['type']}"
+
+                html_message = render_to_string('EventTrainingRegistration.html', {
+                                                'ref_no': registation_obj["ref"], 'client_mail': registation_obj["email"], 'registration_name': registation_obj['event_training_name'], 'type': registation_obj["type"]})
+
+                # my send mail utility class
+                mailer.sib_send_mail(to=[{"email": registation_obj["email"], "name": registation_obj["fullname"]}],
+                                     html_content=html_message, subject=email_subject)
+
         if meta_data["forWhat"] == "member_agm_purchase":
             reference_num = payload['data']['reference']
             amount_paid = payload['data']['amount']
@@ -84,20 +101,22 @@ def paystack_webhook(request, pk=None):
                 payment.is_verified = True
                 payment.save()
 
-            email_subject = f"Registration for Annual General Meeting"
+                payment = model_to_dict(payment)
 
-            html_message = render_to_string('EventTrainingRegistration.html', {
-                                            'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event as a member", 'type': "Event"})
+                email_subject = f"Registration for Annual General Meeting"
 
-            # my send mail utility class
-            mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
-                                 html_content=html_message, subject=email_subject)
+                html_message = render_to_string('EventTrainingRegistration.html', {
+                                                'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event as a member", 'type': "Event"})
 
-            # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
-            payment = get_object_or_404(
-                MembersAGMRegistration, ref=reference_num)
-            payment.mail_recevied = True
-            payment.save()
+                # my send mail utility class
+                mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
+                                     html_content=html_message, subject=email_subject)
+
+                # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
+                payment = get_object_or_404(
+                    MembersAGMRegistration, ref=reference_num)
+                payment.mail_recevied = True
+                payment.save()
 
         if meta_data["forWhat"] == "exhibitor_agm_purchase":
             reference_num = payload['data']['reference']
@@ -110,20 +129,22 @@ def paystack_webhook(request, pk=None):
                 payment.is_verified = True
                 payment.save()
 
-            email_subject = f"Registration for Annual General Meeting"
+                payment = model_to_dict(payment)
 
-            html_message = render_to_string('EventTrainingRegistration.html', {
-                                            'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event an exhibitor", 'type': "AGM Event"})
+                email_subject = f"Registration for Annual General Meeting"
 
-            # my send mail utility class
-            mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
-                                 html_content=html_message, subject=email_subject)
+                html_message = render_to_string('EventTrainingRegistration.html', {
+                                                'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event an exhibitor", 'type': "AGM Event"})
 
-            # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
-            payment = get_object_or_404(
-                ExhibitorsAGMRegistration, ref=reference_num)
-            payment.mail_recevied = True
-            payment.save()
+                # my send mail utility class
+                mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
+                                     html_content=html_message, subject=email_subject)
+
+                # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
+                payment = get_object_or_404(
+                    ExhibitorsAGMRegistration, ref=reference_num)
+                payment.mail_recevied = True
+                payment.save()
 
     return HttpResponse(status=200)
 
