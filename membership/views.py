@@ -51,7 +51,6 @@ class JoiningStepDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.JoiningStepSerializer
     permission_classes = [permissions.IsAuthenticated,]
     lookup_field = "id"
-    queryset = all()
 
     def get_queryset(self):
         return JoiningStep.objects.filter(writer=self.request.user)
