@@ -26,10 +26,9 @@ class WhyJoinManDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.WhyJoinManSerializers
     permission_classes = [permissions.IsAuthenticated,]
     lookup_field = "id"
-    queryset = WhyJoinMan.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return WhyJoinMan.objects.filter(writer=self.request.user)
 
 
 class JoiningStepView(generics.ListCreateAPIView):
@@ -52,10 +51,10 @@ class JoiningStepDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.JoiningStepSerializer
     permission_classes = [permissions.IsAuthenticated,]
     lookup_field = "id"
-    queryset = JoiningStep.objects.all()
+    queryset = all()
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return JoiningStep.objects.filter(writer=self.request.user)
 
 
 class FAQsView(generics.ListCreateAPIView):
@@ -78,10 +77,9 @@ class FAQsDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.FAQsSerializer
     permission_classes = [permissions.IsAuthenticated,]
     lookup_field = "id"
-    queryset = FAQs.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return FAQs.objects.filter(writer=self.request.user)
 
 
 class HomePageView(generics.GenericAPIView):
@@ -108,11 +106,12 @@ class HomePageView(generics.GenericAPIView):
         serializer.save()
 
         return custom_response.Success_response(msg="home main updated", data=serializer.data)
-    
+
+
 class WhyWeAreUniqueView(generics.ListCreateAPIView):
     serializer_class = serializers.WhyWeAreUniqueSerializer
-    permission_classes = [custom_permissions.IsAuthenticated]
-    parser_classes = (custom_parsers.NestedMultipartParser, FormParser,)
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (custom_parsers.NestedMultipartParser, FormParser)
 
     def get_queryset(self):
         return WhyWeAreUnique.objects.all()
@@ -124,31 +123,33 @@ class WhyWeAreUniqueView(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="why we are unique data", data=serializer.data)
-    
+
+
 class WhyWeAreUniqueDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.WhyWeAreUniqueSerializer
-    permission_classes = [custom_permissions.IsAuthenticated]
-    parser_classes = (custom_parsers.NestedMultipartParser, FormParser,)
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (custom_parsers.NestedMultipartParser, FormParser)
     lookup_field = "id"
-    queryset = WhyWeAreUnique.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
-    
+        return WhyWeAreUnique.objects.filter(writer=self.request.user)
+
+
 class OurMembersView(generics.ListCreateAPIView):
     serializer_class = serializers.OurMembersSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return OurMembers.objects.all()
-    
+
     def perform_create(self, serializer):
-        return serializer.save(writer = self.request.user)
-    
+        return serializer.save(writer=self.request.user)
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="our members", data=serializer.data)
+
 
 class OurMembersDetialView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OurMembersSerializer
@@ -156,7 +157,7 @@ class OurMembersDetialView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return OurMembers.objects.filter(writer = self.request.user)
+        return OurMembers.objects.filter(writer=self.request.user)
 
 
 # PUBLIC VIEWS HERE
@@ -197,23 +198,25 @@ class FAQsPublicView(generics.ListAPIView):
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="FAQs Listing", data=serializer.data)
 
+
 class WhyWeAreUniquePublicView(generics.ListAPIView):
     serializer_class = serializers.WhyWeAreUniqueSerializer
 
     def get_queryset(self):
         return WhyWeAreUnique.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="why we are unique data", data=serializer.data)
-    
+
+
 class OurMembersPublicView(generics.ListAPIView):
     serializer_class = serializers.OurMembersSerializer
 
     def get_queryset(self):
         return OurMembers.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
