@@ -44,7 +44,7 @@ class GalleryRenameSerializer(serializers.Serializer):
 
 class GalleryItemSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(required=True)
-    image = Base64ImageField(required=True)
+    image = serializers.ImageField(required=True)
     gallery = serializers.PrimaryKeyRelatedField(
         queryset=Gallery.objects.all(), allow_null=False, required=False)
 
