@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, exceptions
 from rest_framework.parsers import FormParser
 from utils import custom_parsers, custom_response
 from gallery.serializers import GallerySerializer, GalleryRenameSerializer, GalleryItemSerializer
@@ -53,6 +53,7 @@ class GalleryRenameView(generics.GenericAPIView):
 class GalleryItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GalleryItemSerializer
     permission_classes = [permissions.IsAuthenticated,]
+    parser_classes = (custom_parsers.NestedMultipartParser, FormParser,)
     lookup_field = "id"
 
     def get_queryset(self):
@@ -62,11 +63,14 @@ class GalleryItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 class GalleryAddGalleryItem(generics.GenericAPIView):
     serializer_class = GalleryItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (custom_parsers.NestedMultipartParser, FormParser,)
 
     def post(self, request):
         body = request.data
-        if len(request.data["image"]) <= 0 or len(request.data["caption"]) <= 0:
-            return custom_response.Response(data={"message": "invalid image"}, status=status.HTTP_400_BAD_REQUEST)
+
+        gallery = body.get('gallery', None)
+        if gallery == None:
+            raise exceptions.ValidationError("gallery field is required")
 
         serializer = self.serializer_class(data=body)
         serializer.is_valid(raise_exception=True)
