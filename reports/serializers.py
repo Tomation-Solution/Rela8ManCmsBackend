@@ -10,6 +10,8 @@ class ReportsParagraphSerializer(serializers.Serializer):
 class ReportsSerializer(serializers.ModelSerializer):
     details = ReportsParagraphSerializer(
         many=True, required=True, allow_empty=False)
+    readmore_link = serializers.URLField(required=False)
+    link = serializers.FileField(required=False)
 
     def create(self, validated_data):
         report = Reports.objects.create(**validated_data)
