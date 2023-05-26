@@ -19,6 +19,7 @@ class Reports(models.Model):
     link = models.FileField(upload_to='documents/reports/%d/', null=True, default=None,
                             storage=RawMediaCloudinaryStorage())
     details = models.JSONField()
+    readmore_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
