@@ -151,7 +151,13 @@ class AGMInvitationSerializer(serializers.ModelSerializer):
 
 
 class AGMInvitationVerificationSerializer(serializers.Serializer):
+    type_choices = [
+        ("guest", "guest"),
+        ("media", "media"),
+        ("staff", "staff"),
+    ]
     ref = serializers.CharField(required=True)
+    type = serializers.ChoiceField(choices=type_choices, required=True)
 
 
 class QuickRegistrationSerializer(serializers.ModelSerializer):

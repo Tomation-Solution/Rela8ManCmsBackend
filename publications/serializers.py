@@ -15,7 +15,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         many=True, required=True, allow_empty=False)
     price = serializers.DecimalField(
         max_digits=10, decimal_places=2, default=0.00, required=False)
-    readmore_link = serializers.URLField(required=False)
+    readmore_link = serializers.URLField(required=False, allow_blank=True)
 
     image = serializers.ImageField(required=False)
     link = serializers.FileField(required=False)

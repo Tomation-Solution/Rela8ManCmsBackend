@@ -5,6 +5,8 @@ from structure.serializers import SectoralGroupSerializer, MRCSerializer, MRCSer
 from utils import custom_response, custom_parsers, custom_permissions
 
 # Create your views here.
+
+
 class SectoralGroupView(generics.ListCreateAPIView):
     serializer_class = SectoralGroupSerializer
     permission_classes = [permissions.IsAuthenticated,]
@@ -12,14 +14,15 @@ class SectoralGroupView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return SectoralGroup.objects.all()
-    
+
     def perform_create(self, serializer):
-        return serializer.save(writer = self.request.user)
-    
+        return serializer.save(writer=self.request.user)
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="sectoral groups", data=serializer.data)
+
 
 class SectoralGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SectoralGroupSerializer
@@ -28,8 +31,9 @@ class SectoralGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return SectoralGroup.objects.filter(writer = self.request.user)
-    
+        return SectoralGroup.objects.all()
+
+
 class MRCView(generics.GenericAPIView):
     serializer_class = MRCSerializer
     permission_classes = [custom_permissions.IsGetRequestOrAuthenticated]
@@ -54,28 +58,31 @@ class MRCView(generics.GenericAPIView):
 
         return custom_response.Success_response(msg="mrc data", data=serializer.data)
 
+
 class MRCServicesView(generics.ListCreateAPIView):
     serializer_class = MRCServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return MRCServices.objects.all()
-    
+
     def perform_create(self, serializer):
-        return serializer.save(writer = self.request.user)
-    
+        return serializer.save(writer=self.request.user)
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="mrc services", data=serializer.data)
-    
+
+
 class MRCServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MRCServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
 
     def get_queryset(self):
-        return MRCServices.objects.filter(writer = self.request.user)
+        return MRCServices.objects.all()
+
 
 class MPDCLView(generics.GenericAPIView):
     serializer_class = MPDCLSerializer
@@ -102,6 +109,7 @@ class MPDCLView(generics.GenericAPIView):
 
         return custom_response.Success_response(msg="mpdcl data", data=serializer.data)
 
+
 class MPDCLServicesView(generics.ListCreateAPIView):
     serializer_class = MPDCLServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -109,14 +117,15 @@ class MPDCLServicesView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return MPDCLServices.objects.all()
-    
+
     def perform_create(self, serializer):
         return serializer.save(writer=self.request.user)
-    
-    def list(self,request):
+
+    def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="mpdcl service", data=serializer.data)
+
 
 class MPDCLServicesDetialView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MPDCLServicesSerializer
@@ -125,37 +134,41 @@ class MPDCLServicesDetialView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return MPDCLServices.objects.filter(writer = self.request.user)
+        return MPDCLServices.objects.all()
 
-#PUBLIC VIEWS
+# PUBLIC VIEWS
+
+
 class SectoralGroupPublicView(generics.ListAPIView):
     serializer_class = SectoralGroupSerializer
 
     def get_queryset(self):
         return SectoralGroup.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="sectoral groups", data=serializer.data)
-    
+
+
 class MRCServicePublicView(generics.ListAPIView):
     serializer_class = MRCServicesSerializer
 
     def get_queryset(self):
         return MRCServices.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="mrc service", data=serializer.data)
-    
+
+
 class MPDCLServicesPublicView(generics.ListAPIView):
     serializer_class = MPDCLServicesSerializer
 
     def get_queryset(self):
         return MPDCLServices.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)

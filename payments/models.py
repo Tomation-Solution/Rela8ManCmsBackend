@@ -159,7 +159,6 @@ class OthersAGMRegistration(models.Model):
 
 class AGMInvitation(models.Model):
     type_choices = [
-        ("exhibitor-participant", "exhibitor-participant"),
         ("guest", "guest"),
         ("media", "media"),
         ("staff", "staff"),

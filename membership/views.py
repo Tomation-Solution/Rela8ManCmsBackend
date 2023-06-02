@@ -28,7 +28,7 @@ class WhyJoinManDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return WhyJoinMan.objects.filter(writer=self.request.user)
+        return WhyJoinMan.objects.all()
 
 
 class JoiningStepView(generics.ListCreateAPIView):
@@ -53,7 +53,7 @@ class JoiningStepDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return JoiningStep.objects.filter(writer=self.request.user)
+        return JoiningStep.objects.all()
 
 
 class FAQsView(generics.ListCreateAPIView):
@@ -78,7 +78,7 @@ class FAQsDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return FAQs.objects.filter(writer=self.request.user)
+        return FAQs.objects.all()
 
 
 class HomePageView(generics.GenericAPIView):
@@ -131,7 +131,7 @@ class WhyWeAreUniqueDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return WhyWeAreUnique.objects.filter(writer=self.request.user)
+        return WhyWeAreUnique.objects.all()
 
 
 class OurMembersView(generics.ListCreateAPIView):
@@ -156,7 +156,7 @@ class OurMembersDetialView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return OurMembers.objects.filter(writer=self.request.user)
+        return OurMembers.objects.all()
 
 
 # PUBLIC VIEWS HERE
