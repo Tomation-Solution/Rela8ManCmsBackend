@@ -33,7 +33,7 @@ class PublicationDatialView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return self.queryset
 
 
 class PublicationTypeView(generics.ListCreateAPIView):
@@ -58,7 +58,7 @@ class PublicationTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return PublicationType.objects.filter(writer=self.request.user)
+        return PublicationType.objects.all()
 
 # PUBLIC CLASS HERE
 

@@ -33,7 +33,7 @@ class ReportsDetialView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return self.queryset
 
 
 # PUBLIC CLASS HERE

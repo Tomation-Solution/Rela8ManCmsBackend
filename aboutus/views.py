@@ -195,11 +195,10 @@ class AboutWhereWeOperateOfficeViews(generics.ListCreateAPIView):
 class AboutWhereWeOperateOfficeDetailViews(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.AboutWhereWeOperateOfficeSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = models.AboutWhereWeOperateOffice.objects.all()
     lookup_field = "id"
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return models.AboutWhereWeOperateOffice.objects.all()
 
 
 class AboutWhereWeOperateBranchViews(generics.ListCreateAPIView):
@@ -222,12 +221,12 @@ class AboutWhereWeOperateBranchViews(generics.ListCreateAPIView):
 class AboutWhereWeOperateBranchDetailsViews(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.AboutWhereWeOperateBranchSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = models.AboutWhereWeOperateBranch.objects.all()
     lookup_field = "id"
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
-    
+        return models.AboutWhereWeOperateBranch.objects.all()
+
+
 class AboutOurExecutivesViews(generics.ListCreateAPIView):
     serializer_class = serializers.AboutOurExecutivesSerializer
     permission_classes = [custom_permissions.IsAuthenticated]
@@ -235,15 +234,16 @@ class AboutOurExecutivesViews(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return models.AboutOurExecutives.objects.all()
-    
+
     def perform_create(self, serializer):
-        return serializer.save(writer = self.request.user)
-    
+        return serializer.save(writer=self.request.user)
+
     def list(self, request):
         queryset = self.get_queryset()
         serializers = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="our executives data", data=serializers.data)
-    
+
+
 class AboutOurExecutivesDetailViews(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.AboutOurExecutivesSerializer
     permission_classes = [custom_permissions.IsAuthenticated]
@@ -251,9 +251,7 @@ class AboutOurExecutivesDetailViews(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return models.AboutOurExecutives.objects.filter(writer = self.request.user)
-
-
+        return models.AboutOurExecutives.objects.all()
 
 
 # PUBLIC VIEW
@@ -283,13 +281,12 @@ class AboutWhereWeOperateOfficePublicViews(generics.ListAPIView):
         return custom_response.Success_response(data=serializer.data, msg="operation offices")
 
 
-
 class AboutOurExecutivesPublicView(generics.ListAPIView):
     serializer_class = serializers.AboutOurExecutivesSerializer
 
     def get_queryset(self):
         return models.AboutOurExecutives.objects.all()
-    
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)

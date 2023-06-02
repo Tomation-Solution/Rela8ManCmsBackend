@@ -29,7 +29,7 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         queryset = Event.objects.all()
-        return queryset.filter(writer=self.request.user)
+        return queryset
 
 
 class EventViewPublic(generics.ListAPIView):

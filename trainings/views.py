@@ -29,7 +29,7 @@ class TrainingsDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         queryset = Training.objects.all()
-        return queryset.filter(writer=self.request.user)
+        return queryset
 
 
 class TrainingsViewPublic(generics.ListAPIView):
@@ -43,4 +43,3 @@ class TrainingsViewPublic(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(data=serializer.data, msg="public trainings")
-    

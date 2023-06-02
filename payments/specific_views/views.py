@@ -184,7 +184,8 @@ class AGMInvitationVerification(generics.GenericAPIView):
         serializer = self.serializer_class(data=body)
         if serializer.is_valid(raise_exception=True):
             try:
-                invite = AGMInvitation.objects.get(ref=body["ref"])
+                invite = AGMInvitation.objects.get(
+                    ref=body["ref"], type=body["type"])
                 if invite.is_valid == True:
                     invite.is_valid = False
                     invite.save()

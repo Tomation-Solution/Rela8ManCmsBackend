@@ -28,7 +28,7 @@ class GalleryDetailView(generics.RetrieveDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return self.queryset.filter(writer=self.request.user)
+        return self.queryset.all()
 
 
 class GalleryRenameView(generics.GenericAPIView):
