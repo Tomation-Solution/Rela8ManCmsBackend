@@ -7,7 +7,8 @@ from payments.models import PublicationPayment, EventTrainingRegistration, Membe
 from payments.serializers import PublicationPaymentSerailzer, EventTrainingRegistrationSerializer
 from utils import custom_permissions, custom_response, mailer
 from utils.extras import initialize_payment
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -246,19 +247,32 @@ class ViewPublicationPDF(generics.GenericAPIView):
         ref = request.GET.get("ref")
 
         publication_payment = get_object_or_404(PublicationPayment, ref=ref)
-        publication_obj = Publication.objects.get(
-            pk=publication_payment.publication.pk)
-        publication = model_to_dict(publication_obj)
 
-        created_at = publication_obj.created_at.date()
+        try:
+            publication_obj = Publication.objects.get(
+                pk=publication_payment.publication.pk)
 
-        read_more_link = publication_obj.link.url
+            publication = model_to_dict(publication_obj)
 
-        publications_type = publication_obj.type.name
+            created_at = publication_obj.created_at.date()
 
-        pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
-                            "created_at": created_at, "publications_type": publications_type, **publication})
-        return HttpResponse(pdf, content_type='application/pdf')
+            read_more_link = ""
+
+            read_more_link_2 = ""
+
+            if (publication_obj.link):
+                read_more_link = publication_obj.link.url
+
+            if (publication_obj.readmore_link):
+                read_more_link_2 = publication_obj.readmore_link
+
+            publications_type = publication_obj.type.name
+
+            pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link, "read_more_link_2": read_more_link_2,
+                                "created_at": created_at, "publications_type": publications_type, **publication})
+            return HttpResponse(pdf, content_type='application/pdf')
+        except:
+            return Response(data={"message": "failed to get publication"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class DownloadPublicationPDF(generics.GenericAPIView):
@@ -270,21 +284,33 @@ class DownloadPublicationPDF(generics.GenericAPIView):
         ref = request.GET.get("ref")
 
         publication_payment = get_object_or_404(PublicationPayment, ref=ref)
-        publication_obj = Publication.objects.get(
-            pk=publication_payment.publication.pk)
-        publication = model_to_dict(publication_obj)
 
-        created_at = publication_obj.created_at.date()
+        try:
+            publication_obj = Publication.objects.get(
+                pk=publication_payment.publication.pk)
+            publication = model_to_dict(publication_obj)
 
-        read_more_link = publication_obj.link.url
+            created_at = publication_obj.created_at.date()
 
-        publications_type = publication_obj.type.name
+            read_more_link = ""
 
-        pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link,
-                            "created_at": created_at, "publications_type": publications_type, **publication})
+            read_more_link_2 = ""
 
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "Publication_%s.pdf" % (f"{publication['name']}")
-        content = "attachment; filename=%s" % (filename)
-        response['Content-Disposition'] = content
-        return response
+            if (publication_obj.link):
+                read_more_link = publication_obj.link.url
+
+            if (publication_obj.readmore_link):
+                read_more_link_2 = publication_obj.readmore_link
+
+            publications_type = publication_obj.type.name
+
+            pdf = render_to_pdf('PublicationHtml2Pdf.html', {"read_more_link": read_more_link, "read_more_link_2": read_more_link_2,
+                                "created_at": created_at, "publications_type": publications_type, **publication})
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "Publication_%s.pdf" % (f"{publication['name']}")
+            content = "attachment; filename=%s" % (filename)
+            response['Content-Disposition'] = content
+            return response
+        except:
+            return Response(data={"message": "failed to get publication"}, status=status.HTTP_404_NOT_FOUND)
