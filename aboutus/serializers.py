@@ -89,13 +89,15 @@ class AboutWhereWeOperateBranchSerializer(serializers.ModelSerializer):
         model = models.AboutWhereWeOperateBranch
         exclude = ["writer"]
 
+
 class AboutOurExecutivesSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required = False)
-    name = serializers.CharField(required = True)
-    title = serializers.CharField(required = True)
-    extra_title1 = serializers.CharField(required = False)
-    extra_title2 = serializers.CharField(required = False)
-    type = serializers.CharField(required = True)
+    image = serializers.ImageField(required=False)
+    name = serializers.CharField(required=True)
+    title = serializers.CharField(required=True)
+    extra_title1 = serializers.CharField(required=False)
+    extra_title2 = serializers.CharField(required=False)
+    type = serializers.CharField(required=True)
+    tenor = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = models.AboutOurExecutives
