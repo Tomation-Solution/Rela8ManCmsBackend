@@ -148,6 +148,7 @@ class AboutContactUs(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+
 class AboutOurExecutives(models.Model):
     executive_type = [
         ("EXECUTIVE", "EXECUTIVE"),
@@ -167,6 +168,7 @@ class AboutOurExecutives(models.Model):
     extra_title1 = models.CharField(max_length=300, blank=True, null=True)
     extra_title2 = models.CharField(max_length=300, blank=True, null=True)
     type = models.CharField(max_length=100, choices=executive_type)
+    tenor = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
