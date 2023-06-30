@@ -59,7 +59,7 @@ class WhyWeAreUniqueSerializer(serializers.ModelSerializer):
         exclude = ["writer"]
 
 class OurMembersSerializer(serializers.ModelSerializer):
-    website = serializers.URLField(required=False)
+    website = serializers.URLField(required=False,blank=True)
 
     class Meta:
         model = OurMembers
