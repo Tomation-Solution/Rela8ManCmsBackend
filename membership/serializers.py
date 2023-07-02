@@ -36,12 +36,12 @@ class HomePageSerializer(serializers.ModelSerializer):
     slider_vision_message = serializers.CharField(required=True)
     slider_mission_message = serializers.CharField(required=True)
 
-    vision_intro = serializers.JSONField(required = True)
-    mission_intro = serializers.JSONField(required = True)
-    advocacy_intro = serializers.JSONField(required = True)
-    history_intro = serializers.JSONField(required = True)
-    why_join_intro = serializers.JSONField(required = True)
-    members_intro = serializers.JSONField(required = True)
+    vision_intro = serializers.JSONField(required=True)
+    mission_intro = serializers.JSONField(required=True)
+    advocacy_intro = serializers.JSONField(required=True)
+    history_intro = serializers.JSONField(required=True)
+    why_join_intro = serializers.JSONField(required=True)
+    members_intro = serializers.JSONField(required=True)
 
     slider_image1 = serializers.ImageField(required=False)
     slider_image2 = serializers.ImageField(required=False)
@@ -51,15 +51,17 @@ class HomePageSerializer(serializers.ModelSerializer):
         model = HomePage
         exclude = ["writer"]
 
+
 class WhyWeAreUniqueSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required = False)
-    
+    image = serializers.ImageField(required=False)
+
     class Meta:
         model = WhyWeAreUnique
         exclude = ["writer"]
 
+
 class OurMembersSerializer(serializers.ModelSerializer):
-    website = serializers.URLField(required=False,blank=True)
+    website = serializers.URLField(required=False, allow_blank=True)
 
     class Meta:
         model = OurMembers
