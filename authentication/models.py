@@ -36,7 +36,8 @@ class User(PermissionsMixin, AbstractBaseUser):
         ("public_view", "public_view"),
         ("registrations_payments", "registrations_payments"),
         ("prospective_certificates", "prospective_certificates"),
-        ("super_user", "super_user")
+        ("super_user", "super_user"),
+        ("executive_secretary", "executive_secretary"),
     ]
 
     email = models.EmailField(max_length=255, unique=True, db_index=True)
