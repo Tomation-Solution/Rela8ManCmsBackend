@@ -8,4 +8,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/blacklist/', views.LogoutUserView.as_view(),
          name='token_blacklist'),
+    path('create-account/',views.CreateAccount.as_view(),name='create-account'),
 ]

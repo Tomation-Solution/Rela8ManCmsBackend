@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
-from authentication.serializers import LoginUserSerializer, LogoutSerializer
-# Create your views here.
-
+from authentication.serializers import LoginUserSerializer, LogoutSerializer,CreationOfAccountsSerializer
+from . import permissions as custom_permission 
 
 class LoginUserView(generics.GenericAPIView):
     serializer_class = LoginUserSerializer
@@ -29,3 +28,16 @@ class LogoutUserView(generics.GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_200_OK)
+
+class CreateAccount(generics.GenericAPIView):
+    serializer_class = CreationOfAccountsSerializer
+    permission_classes = [permissions.IsAuthenticated,custom_permission.IsSuperAdmin]
+
+
+    def post(self, request):
+        user_type = request.query_params.get('user_type','executive_secretary')
+        serializer = self.serializer_class(data=request.data, context={'user_type':user_type})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_200_OK,data={'message':'user account created successfully','status':status.HTTP_200_OK})

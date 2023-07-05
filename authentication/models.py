@@ -20,16 +20,28 @@ class UserManager(BaseUserManager):
         if password is None:
             raise ValueError("Super User must have a password")
 
-        user = self.create_user(email, password)
-        user.user_type = "super_user"
+        user = self.create_user(email, password=password,user_type='super_user')
+        # user.user_type = "super_user"
         user.is_superuser = True
         user.is_staff = True
+        user.is_active=True #the superuser has to be active when he get created 
+
+        user.save()
+
+        return user
+
+    def create_executive_secretary(self,email,password):
+        if password is None:
+            raise ValueError("Executive Secretary User Must have A Password")
+
+        user = self.create_user(email,'executive_secretary', password)
+        user.is_active = True
         user.save()
 
         return user
 
 
-class User(PermissionsMixin, AbstractBaseUser):
+class User( AbstractBaseUser,PermissionsMixin,):
     user_choices = [
         ("publication_news", "publication_news"),
         ("event_training", "event_training"),

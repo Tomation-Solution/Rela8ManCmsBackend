@@ -165,12 +165,16 @@ DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
 if not DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": 'django.db.backends.postgresql',
+            "NAME": os.environ.get("DB_NAME"),
+            "USER":  os.environ.get("DB_USER"),
+            "PASSWORD":  os.environ.get("DB_PASS"),
+            "HOST":  os.environ.get("DB_HOST"),
+            "PORT":  os.environ.get("DB_PORT"),
+            "CONN_MAX_AGE": 60,
         }
     }
-
 else:
     db_info = urlparse(DATABASE_URL)
     DATABASES = {
