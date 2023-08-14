@@ -28,26 +28,6 @@ def flutterwave_webhook(request, pk=None):
         reason_for_payment, ref = main_data.get('txRef').split("--")
         amount = main_data.get("amount", "")
 
-        print({
-            "amount": amount,
-            "reason_for_payment": reason_for_payment,
-            "ref": ref
-        })
+        return extras.webhook_payment_handler(request=request, forWhat=reason_for_payment, ref=ref, amount=amount)
 
-        # return extras.webhook_payment_handler(request=request, forWhat=forWhat, ref=ref, amount=amount)
-
-    return HttpResponse(status=200)
-
-
-class TestFlutterWavePayment(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        ref = secrets.token_urlsafe(20)
-        buyer_obj = {
-            "email": "popoolakejiah@gmail.com",
-            "ref": ref
-        }
-
-        return extras.initialize_flutterwave_payment(
-            "food", 50, buyer_obj, "www.youtube.com")
+    return HttpResponse(status=500)

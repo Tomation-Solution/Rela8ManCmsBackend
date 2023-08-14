@@ -30,126 +30,7 @@ def paystack_webhook(request, pk=None):
     if payload.get('event') == 'charge.success':
         return webhook_payment_handler(request=request, forWhat=forWhat, ref=ref, amount=amount)
 
-        # if meta_data["forWhat"] == "publication_purchase":
-        #     reference_num = payload['data']['reference']
-        #     amount_paid = payload['data']['amount']
-        #     payment = get_object_or_404(PublicationPayment, ref=reference_num)
-        #     amount_to_pay = int(float(payment.amount_to_pay))*100
-
-        #     if amount_to_pay == amount_paid:
-        #         payment.is_verified = True
-        #         payment.save()
-
-        #         current_site = get_current_site(request).domain
-
-        #         relativePath = reverse("download-publication")
-        #         viewPath = reverse("view-publication")
-
-        #         purchase_item = "publication"
-
-        #         absUrl = "http://" + current_site + \
-        #             relativePath+"?ref="+str(reference_num)
-        #         viewUrl = "http://" + current_site + \
-        #             viewPath + "?ref="+str(reference_num)
-
-        #         email_subject = "MAN purchase of publication"
-
-        #         html_message = render_to_string('GetFile.html', {
-        #                                         'purchase_download_url': absUrl, 'client_mail': payment.email, "purchase_item": purchase_item, "purchase_view_url": viewUrl})
-
-        #         # my send mail utility class
-        #         mailer.sib_send_mail(to=[{"email": payment.email, "name": payment.fullname}],
-        #                              html_content=html_message, subject=email_subject)
-
-        #         # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
-        #         payment = get_object_or_404(
-        #             PublicationPayment, ref=reference_num)
-        #         payment.file_received = True
-        #         payment.save()
-
-        # if meta_data["forWhat"] in ("event_purchase", "training_purchase"):
-        #     reference_num = payload['data']['reference']
-        #     amount_paid = payload['data']['amount']
-        #     payment = get_object_or_404(
-        #         EventTrainingRegistration, ref=reference_num)
-        #     amount_to_pay = int(float(payment.amount_to_pay))*100
-
-        #     if amount_to_pay == amount_paid:
-        #         payment.is_verified = True
-        #         payment.save()
-
-        #         registation_obj = model_to_dict(payment)
-
-        #         if payment.type == "EVENT":
-        #             registation_obj["event_training_name"] = payment.event.name
-
-        #         elif payment.type == "TRAINING":
-        #             registation_obj["event_training_name"] = payment.training.name
-
-        #         email_subject = f"Registration for {registation_obj['type']}"
-
-        #         html_message = render_to_string('EventTrainingRegistration.html', {
-        #                                         'ref_no': registation_obj["ref"], 'client_mail': registation_obj["email"], 'registration_name': registation_obj['event_training_name'], 'type': registation_obj["type"]})
-
-        #         # my send mail utility class
-        #         mailer.sib_send_mail(to=[{"email": registation_obj["email"], "name": registation_obj["fullname"]}],
-        #                              html_content=html_message, subject=email_subject)
-
-        # if meta_data["forWhat"] == "member_agm_purchase":
-        #     reference_num = payload['data']['reference']
-        #     amount_paid = payload['data']['amount']
-        #     payment = get_object_or_404(
-        #         MembersAGMRegistration, ref=reference_num)
-        #     amount_to_pay = int(float(payment.amount_to_pay))*100
-
-        #     if amount_to_pay == amount_paid:
-        #         payment.is_verified = True
-        #         payment.save()
-
-        #         payment = model_to_dict(payment)
-
-        #         email_subject = f"Registration for Annual General Meeting"
-
-        #         html_message = render_to_string('EventTrainingRegistration.html', {
-        #                                         'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event as a member", 'type': "Event"})
-
-        #         # my send mail utility class
-        #         mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
-        #                              html_content=html_message, subject=email_subject)
-
-        #         # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
-        #         payment = get_object_or_404(
-        #             MembersAGMRegistration, ref=reference_num)
-        #         payment.mail_recevied = True
-        #         payment.save()
-
-        # if meta_data["forWhat"] == "exhibitor_agm_purchase":
-        # reference_num = payload['data']['reference']
-        # amount_paid = payload['data']['amount']
-        # payment = get_object_or_404(
-        #     ExhibitorsAGMRegistration, ref=reference_num)
-        # amount_to_pay = int(float(payment.amount_to_pay))*100
-
-        # if amount_to_pay == amount_paid:
-        #     payment.is_verified = True
-        #     payment.save()
-
-        #     payment = model_to_dict(payment)
-
-        #     email_subject = f"Registration for Annual General Meeting"
-
-        #     html_message = render_to_string('EventTrainingRegistration.html', {
-        #                                     'ref_no': payment["ref"], 'client_mail': payment["email"], 'registration_name': "MAN AGM event an exhibitor", 'type': "AGM Event"})
-
-        #     # my send mail utility class
-        #     mailer.sib_send_mail(to=[{"email": payment["email"], "name": payment["company_name"]}],
-        #                          html_content=html_message, subject=email_subject)
-
-        #     # THIS WAS WRITTEN HERE AGAIN INCASE THE MAILING PROCESS EVER FAILS
-        #     payment = get_object_or_404(
-        #         ExhibitorsAGMRegistration, ref=reference_num)
-        #     payment.mail_recevied = True
-        #     payment.save()
+    return HttpResponse(status=500)
 
 
 class EventTrainingRegistrationView(generics.GenericAPIView):
@@ -169,6 +50,7 @@ class EventTrainingRegistrationView(generics.GenericAPIView):
 
     def post(self, request):
         body = request.data
+        gatewaytype = request.GET.get("gatewaytype", "")
         serializer = self.serializer_class(data=body)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -181,11 +63,13 @@ class EventTrainingRegistrationView(generics.GenericAPIView):
         if (registration_instance.type == "EVENT" and registration_instance.event.is_paid):
             event_amount = registration_instance.event.price
             return initialize_payment(reason_for_payment="event_purchase",
+                                      gatewaytype=gatewaytype,
                                       amount=event_amount, buyer_obj=registation_obj)
 
         if (registration_instance.type == "TRAINING" and registration_instance.training.is_paid):
             event_amount = registration_instance.training.price
             return initialize_payment(reason_for_payment="training_purchase",
+                                      gatewaytype=gatewaytype,
                                       amount=event_amount, buyer_obj=registation_obj)
 
         if registration_instance.type == "EVENT":
@@ -224,6 +108,7 @@ class PublicationPaymentView(generics.GenericAPIView):
 
     def post(self, request):
         body = request.data
+        gatewaytype = request.GET.get("gatewaytype", "")
         serializer = self.serializer_class(data=body)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -237,6 +122,7 @@ class PublicationPaymentView(generics.GenericAPIView):
         reason_for_payment = "publication_purchase"
 
         return initialize_payment(reason_for_payment=reason_for_payment,
+                                  gatewaytype=gatewaytype,
                                   amount=publication_amount, buyer_obj=buyer_obj, callback_url="https://man-new-test-site.netlify.app/paid-publications")
 
 

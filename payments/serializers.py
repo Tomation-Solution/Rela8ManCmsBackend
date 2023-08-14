@@ -8,7 +8,7 @@ from trainings.models import Training
 
 class PublicationPaymentSerailzer(serializers.ModelSerializer):
     publication = serializers.PrimaryKeyRelatedField(
-        allow_null=False, queryset=Publication.objects.all(), required=True)
+        allow_null=False, queryset=Publication.objects.filter(is_paid=True), required=True)
 
     class Meta:
         model = PublicationPayment

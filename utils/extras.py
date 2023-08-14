@@ -158,7 +158,14 @@ def convert_naira_to_kobo(naira):
     return kobo
 
 
-def initialize_payment(reason_for_payment, amount, buyer_obj, callback_url=None):
+def initialize_payment(reason_for_payment, amount, buyer_obj, gatewaytype="paystack", callback_url=None):
+    if gatewaytype == "flutterwave":
+        return initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callback_url)
+    else:
+        return initialize_paystack_payment(reason_for_payment, amount, buyer_obj, callback_url)
+
+
+def initialize_paystack_payment(reason_for_payment, amount, buyer_obj, callback_url=None):
     if settings.PAYSTACK_SECRET_KEY is None:
         return custom_response.Response(data={"message": "Oops invalid keys, please try again"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -211,7 +218,7 @@ def initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callba
 
     body = {
         'tx_ref':  used_ref,
-        'amount': amount,
+        'amount': int(amount),
         'currency': "NGN",
         'redirect_url': callback_url,
         'meta': {
