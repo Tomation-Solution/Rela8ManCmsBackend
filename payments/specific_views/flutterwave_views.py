@@ -25,9 +25,10 @@ def flutterwave_webhook(request, pk=None):
         return HttpResponse(status=401)
 
     if main_data["status"] == "successful" and main_data["currency"] == "NGN":
-        reason_for_payment, ref = main_data.get('txRef').split("--")
+        print(main_data.get('txRef'))
+        dataList = main_data.get('txRef').split("--")
         amount = main_data.get("amount", "")
 
-        return extras.webhook_payment_handler(request=request, forWhat=reason_for_payment, ref=ref, amount=amount)
+        return extras.webhook_payment_handler(request=request, forWhat=dataList[0], ref=dataList[1], amount=amount)
 
     return HttpResponse(status=500)
