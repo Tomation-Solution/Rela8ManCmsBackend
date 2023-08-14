@@ -58,6 +58,7 @@ class MembersAGMRegistrationView(generics.GenericAPIView):
 
     def post(self, request):
         body = request.data
+        gatewaytype = request.POST.get("gatewaytype")
         serializer = self.serializer_class(data=body)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -72,6 +73,7 @@ class MembersAGMRegistrationView(generics.GenericAPIView):
         reason_for_payment = "member_agm_purchase"
 
         return initialize_payment(reason_for_payment=reason_for_payment,
+                                  gatewaytype=gatewaytype,
                                   amount=payment_amount, buyer_obj=buyer_obj)
 
 
@@ -89,6 +91,7 @@ class ExhibitorsAGMRegistrationView(generics.GenericAPIView):
 
     def post(self, request):
         body = request.data
+        gatewaytype = request.GET.get("gatewaytype", "")
         serializer = self.serializer_class(data=body)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -103,6 +106,7 @@ class ExhibitorsAGMRegistrationView(generics.GenericAPIView):
         reason_for_payment = "exhibitor_agm_purchase"
 
         return initialize_payment(reason_for_payment=reason_for_payment,
+                                  gatewaytype=gatewaytype,
                                   amount=payment_amount, buyer_obj=buyer_obj)
 
 
