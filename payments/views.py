@@ -10,15 +10,14 @@ from utils.extras import initialize_payment, webhook_payment_handler
 from rest_framework import generics, status
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 
 from utils.html2pdf import render_to_pdf
 
 
 # Create your views here.
-
+@require_POST
 @csrf_exempt
 def paystack_webhook(request, pk=None):
     payload = json.loads(request.body)
