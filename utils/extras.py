@@ -207,8 +207,10 @@ def initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callba
         'Content-Type': 'application/json',
         'Accept': 'application/json', }
 
+    used_ref = f"{reason_for_payment}--{buyer_obj['ref']}"
+
     body = {
-        'tx_ref': buyer_obj["ref"],
+        'tx_ref':  used_ref,
         'amount': amount,
         'currency': "NGN",
         'redirect_url': callback_url,
@@ -224,8 +226,6 @@ def initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callba
         res = requests.post(url, headers=headers, data=json.dumps(body))
     except requests.ConnectionError:
         return custom_response.Response(data={"error": "Network Error"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-    print(res.json())
 
     if res.status_code == 200:
         res_data = res.json()

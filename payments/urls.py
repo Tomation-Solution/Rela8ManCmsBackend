@@ -8,6 +8,8 @@ urlpatterns = [
     path("webhook", views.paystack_webhook, name="webhook"),
     path("flutterwave-webhook", flutterwave_views.flutterwave_webhook,
          name="flutterwave-webhook"),  # https://web-production-9688.up.railway.app/api/payments/flutterwave-webhook
+
+    #     https://web-production-9688.up.railway.app/api/payments/flutterwave-webhook
     # WEBHOOKS
 
     path("test-flutterwave-payments", flutterwave_views.TestFlutterWavePayment.as_view(),
