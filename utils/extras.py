@@ -15,12 +15,14 @@ from utils import custom_response, mailer
 from payments.models import PublicationPayment, MembersAGMRegistration, EventTrainingRegistration, ExhibitorsAGMRegistration
 
 
-def webhook_payment_handler(request, forWhat: str, ref: str, amount: float | int):
+def webhook_payment_handler(request, forWhat: str, ref: str, amount: float | int, callerName="paystack"):
+
     if forWhat == "publication_purchase":
         reference_num = ref
         amount_paid = amount
         payment = get_object_or_404(PublicationPayment, ref=reference_num)
-        amount_to_pay = int(float(payment.amount_to_pay))*100
+        amount_to_pay = int(float(payment.amount_to_pay)) * \
+            100 if callerName == "paystack" else payment.amount_to_pay
 
         if amount_to_pay == amount_paid:
             payment.is_verified = True
@@ -58,7 +60,8 @@ def webhook_payment_handler(request, forWhat: str, ref: str, amount: float | int
         amount_paid = amount
         payment = get_object_or_404(
             EventTrainingRegistration, ref=reference_num)
-        amount_to_pay = int(float(payment.amount_to_pay))*100
+        amount_to_pay = int(float(payment.amount_to_pay)) * \
+            100 if callerName == "paystack" else payment.amount_to_pay
 
         if amount_to_pay == amount_paid:
             payment.is_verified = True
@@ -86,7 +89,8 @@ def webhook_payment_handler(request, forWhat: str, ref: str, amount: float | int
         amount_paid = amount
         payment = get_object_or_404(
             MembersAGMRegistration, ref=reference_num)
-        amount_to_pay = int(float(payment.amount_to_pay))*100
+        amount_to_pay = int(float(payment.amount_to_pay)) * \
+            100 if callerName == "paystack" else payment.amount_to_pay
 
         if amount_to_pay == amount_paid:
             payment.is_verified = True
@@ -114,7 +118,8 @@ def webhook_payment_handler(request, forWhat: str, ref: str, amount: float | int
         amount_paid = amount
         payment = get_object_or_404(
             ExhibitorsAGMRegistration, ref=reference_num)
-        amount_to_pay = int(float(payment.amount_to_pay))*100
+        amount_to_pay = int(float(payment.amount_to_pay)) * \
+            100 if callerName == "paystack" else payment.amount_to_pay
 
         if amount_to_pay == amount_paid:
             payment.is_verified = True
