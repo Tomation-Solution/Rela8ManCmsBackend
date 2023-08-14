@@ -20,6 +20,9 @@ class EventsSerializer(serializers.ModelSerializer):
                 raise exceptions.ValidationError(
                     "price must not be provided on free events.")
         if is_agm == True:
+            if Event.objects.filter(is_agm=True).exists():
+                raise exceptions.ValidationError("only on agm event can exist")
+
             if price:
                 raise exceptions.ValidationError(
                     "you cant provide a price for agm events.")
@@ -34,6 +37,9 @@ class EventsSerializer(serializers.ModelSerializer):
             instance.price = 0.00
 
         if is_agm == True:
+            if Event.objects.filter(is_agm=True).exists():
+                raise exceptions.ValidationError("only on agm event can exist")
+
             instance.price = 0.00
             instance.is_paid = False
 

@@ -1,10 +1,19 @@
-from django.shortcuts import render
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, decorators, exceptions
 from rest_framework.parsers import FormParser
 from events.models import Event
 from events.serializers import EventsSerializer
 from utils import custom_response, custom_parsers
 # Create your views here.
+
+
+@decorators.api_view(["GET"])
+def getAGMEvent(request):
+    if request.method == "GET":
+        agm_event = Event.objects.get(is_agm=True)
+        serializer = EventsSerializer(agm_event)
+        return custom_response.Success_response(msg="agm event", data=serializer.data)
+    else:
+        raise exceptions.MethodNotAllowed
 
 
 class EventView(generics.ListCreateAPIView):

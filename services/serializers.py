@@ -21,13 +21,15 @@ class RequestServiceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         while True:
-            ref = secrets.token_urlsafe(50)
-            object_with_similar_ref = models.RequestService.objects.filter(ref=ref)
+            ref = secrets.token_urlsafe(20)
+            object_with_similar_ref = models.RequestService.objects.filter(
+                ref=ref)
             if not object_with_similar_ref:
                 validated_data['ref'] = ref
                 break
 
-        service_request = models.RequestService.objects.create(**validated_data)
+        service_request = models.RequestService.objects.create(
+            **validated_data)
 
         return service_request
 
@@ -41,12 +43,14 @@ class SubscribeToNewsLetterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
-            object_with_similar_ref = models.RequestService.objects.filter(ref = ref)
+            ref = secrets.token_urlsafe(20)
+            object_with_similar_ref = models.RequestService.objects.filter(
+                ref=ref)
             if not object_with_similar_ref:
                 validated_data['ref'] = ref
                 break
 
-        newletter_subscription = models.SubscribeToNewsLetter.objects.create(**validated_data)
+        newletter_subscription = models.SubscribeToNewsLetter.objects.create(
+            **validated_data)
 
         return newletter_subscription

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "membership",
     "structure",
     "payments",
+    "agmcms",
     # MAILING
     "anymail",
 
@@ -120,6 +121,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -225,13 +227,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "static"
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 MEDIA_URL = '/media/'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
@@ -253,3 +254,8 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY")
+
+
+FLUTTERWAVE_PUBLIC_KEY = os.environ.get("FLUTTERWAVE_PUBLIC_KEY")
+FLUTTERWAVE_SECRET_KEY = os.environ.get("FLUTTERWAVE_SECRET_KEY")
+FLUTTERWAVE_SECRET_HASH = os.environ.get("FLUTTERWAVE_SECRET_HASH")
