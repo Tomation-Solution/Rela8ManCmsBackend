@@ -232,7 +232,7 @@ def initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callba
 
         # return custom_response.Success_response(msg="payment initilaized", data=res_data)
         paystack_like_response = generatePaystackLikeResponse(
-            ref=buyer_obj["ref"], link=res_data["data"]["link"])
+            ref=used_ref, link=res_data["data"]["link"])
         return custom_response.Success_response(msg="payment initilaized", data=paystack_like_response)
     else:
         return custom_response.Response(data={"message": "something went wrong, please try again"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
