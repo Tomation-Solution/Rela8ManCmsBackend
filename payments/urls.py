@@ -1,9 +1,18 @@
 from django.urls import path
 from payments import views
 from payments.specific_views import views as specifics
+from payments.specific_views import flutterwave_views
 
 urlpatterns = [
+    # WEBHOOKS
     path("webhook", views.paystack_webhook, name="webhook"),
+    path("flutterwave-webhook", flutterwave_views.flutterwave_webhook,
+         name="flutterwave-webhook"),  # https://web-production-9688.up.railway.app/api/payments/flutterwave-webhook
+    # WEBHOOKS
+
+    path("test-flutterwave-payments", flutterwave_views.TestFlutterWavePayment.as_view(),
+         name="test-flutterwave-payments"),
+
     path("publications", views.PublicationPaymentView.as_view(),
          name="publication-payment"),
     path("download-publication", views.DownloadPublicationPDF.as_view(),

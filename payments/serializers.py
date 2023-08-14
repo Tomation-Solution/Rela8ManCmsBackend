@@ -17,7 +17,7 @@ class PublicationPaymentSerailzer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = PublicationPayment.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:
@@ -63,7 +63,7 @@ class EventTrainingRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = EventTrainingRegistration.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:

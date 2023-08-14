@@ -37,7 +37,7 @@ class MembersAGMRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = models.MembersAGMRegistration.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:
@@ -68,7 +68,7 @@ class ExhibitorsAGMRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = models.ExhibitorsAGMRegistration.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:
@@ -118,7 +118,7 @@ class OthersAGMRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = models.OthersAGMRegistration.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:
@@ -139,7 +139,7 @@ class AGMInvitationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         while True:
-            ref = secrets.token_urlsafe(50)
+            ref = secrets.token_urlsafe(20)
             object_with_similar_ref = models.OthersAGMRegistration.objects.filter(
                 ref=ref).exists()
             if not object_with_similar_ref:
