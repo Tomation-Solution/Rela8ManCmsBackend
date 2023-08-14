@@ -19,9 +19,7 @@ def flutterwave_webhook(request, pk=None):
     # VERIFY IF REQUEST COMES FROM FLUTTERWAVE
     secret_hash = settings.FLUTTERWAVE_SECRET_HASH
 
-    signature = request.headers.get("verifi-hash")
-
-    print(request.headers)
+    signature = request.headers.get("Verif-Hash")
 
     if signature == None or (signature != secret_hash):
         return HttpResponse(status=401)
