@@ -19,7 +19,7 @@ urlpatterns = [
     path("our-members/<int:id>", views.OurMembersDetialView.as_view(),
          name="our-members-details"),
     path("advertisement", views.AdvertismentView.as_view(), name="advertisement"),
-    path("advertisement/<int:id>", views.AdvertismentView.as_view(),
+    path("advertisement/<int:id>", views.AdvertistmentDetailedView.as_view(),
          name="advertisement-detailed"),
 
 
