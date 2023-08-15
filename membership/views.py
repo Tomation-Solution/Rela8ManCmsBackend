@@ -1,6 +1,6 @@
-from rest_framework import generics, permissions, exceptions, status
+from rest_framework import generics, permissions, exceptions, status, parsers
 from membership import serializers
-from membership.models import WhyJoinMan, JoiningStep, FAQs, HomePage, WhyWeAreUnique, OurMembers
+from membership.models import WhyJoinMan, JoiningStep, FAQs, HomePage, WhyWeAreUnique, OurMembers, Advertisement
 from rest_framework.parsers import FormParser
 from utils import custom_parsers, custom_response, custom_permissions
 # Create your views here.
@@ -159,6 +159,30 @@ class OurMembersDetialView(generics.RetrieveUpdateDestroyAPIView):
         return OurMembers.objects.all()
 
 
+class AdvertismentView(generics.ListCreateAPIView):
+    serializer_class = serializers.AdvertismentViewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [parsers.FormParser, custom_parsers.NestedMultipartParser]
+
+    def get_queryset(self):
+        return Advertisement.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializers = self.serializer_class(queryset, many=True)
+        return custom_response.Success_response(msg="all advertisments", data=serializers.data)
+
+
+class AdvertistmentDetailedView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.AdvertismentViewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [parsers.FormParser, custom_parsers.NestedMultipartParser]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Advertisement.objects.all()
+
+
 # PUBLIC VIEWS HERE
 
 
@@ -220,3 +244,15 @@ class OurMembersPublicView(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(msg="our members", data=serializer.data)
+
+
+class AdvertisementPublicView(generics.ListAPIView):
+    serializer_class = serializers.AdvertismentViewSerializer
+
+    def get_queryset(self):
+        return Advertisement.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializers = self.serializer_class(queryset, many=True)
+        return custom_response.Success_response(msg="all advertisments", data=serializers.data)

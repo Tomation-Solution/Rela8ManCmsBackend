@@ -1,5 +1,5 @@
-from rest_framework import serializers
-from membership.models import WhyJoinMan, JoiningStep, FAQs, HomePage, WhyWeAreUnique, OurMembers
+from rest_framework import serializers, exceptions
+from membership.models import WhyJoinMan, JoiningStep, FAQs, HomePage, WhyWeAreUnique, OurMembers, Advertisement
 
 
 class WhyJoinManSerializers(serializers.ModelSerializer):
@@ -66,3 +66,17 @@ class OurMembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = OurMembers
         exclude = ["writer"]
+
+
+class AdvertismentViewSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs):
+        number_of_adverts = Advertisement.objects.count()
+        if number_of_adverts >= 3:
+            raise exceptions.ValidationError(
+                "maximum of three adds can be created")
+        return super().validate(attrs)
+
+    class Meta:
+        model = Advertisement
+        fields = "__all__"

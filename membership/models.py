@@ -75,6 +75,8 @@ class OurMembers(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=300)
     website = models.URLField(blank=True, null=True)
+    description = models.TextField(
+        blank=True, null=True, default="A Member of Man")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
@@ -84,3 +86,16 @@ class OurMembers(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class Advertisement(models.Model):
+    image = models.ImageField(
+        upload_to="images/advert/", blank=True, null=True)
+    text = models.CharField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "advertisment"
+        verbose_name_plural = "advertisments"

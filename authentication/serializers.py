@@ -20,7 +20,7 @@ class LoginUserSerializer(serializers.ModelSerializer):
         password = attrs.get("password", "")
 
         user: User = authenticate(email=email, password=password)
-        print({'user':user,"password":password,'email':email})
+        # print({'user':user,"password":password,'email':email})
         if not user:
             raise exceptions.AuthenticationFailed("invalid Credentials")
 
@@ -55,19 +55,18 @@ class LogoutSerializer(serializers.Serializer):
             self.fail("bad_token")
 
 
-
 class CreationOfAccountsSerializer(serializers.Serializer):
-    password = serializers.CharField(trim_whitespace =True)
+    password = serializers.CharField(trim_whitespace=True)
     email = serializers.EmailField()
 
-
     def create(self, validated_data):
-        user_type= self.context.get('user_type',)
-        if   User.objects.filter(email=validated_data['email']).exists():
-            raise serializers.ValidationError(detail={'message':'user exists'})
+        user_type = self.context.get('user_type',)
+        if User.objects.filter(email=validated_data['email']).exists():
+            raise serializers.ValidationError(
+                detail={'message': 'user exists'})
         if user_type == 'executive_secretary':
             return User.objects.create_executive_secretary(
-            **validated_data,  
+                **validated_data,
             )
         else:
             raise ValueError("Please select right user type")
