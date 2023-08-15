@@ -25,7 +25,6 @@ def flutterwave_webhook(request, pk=None):
         return HttpResponse(status=401)
 
     if main_data["status"] == "successful" and main_data["currency"] == "NGN":
-        print(main_data.get('txRef'))
         dataList = main_data.get('txRef').split("--")
         amount = main_data.get("amount", "")
 
