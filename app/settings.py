@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "agmcms",
     # MAILING
     "anymail",
+    'homepage',
 
 ]
 
