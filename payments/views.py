@@ -123,7 +123,7 @@ class PublicationPaymentView(generics.GenericAPIView):
 
         return initialize_payment(reason_for_payment=reason_for_payment,
                                   gatewaytype=gatewaytype,
-                                  amount=publication_amount, buyer_obj=buyer_obj, callback_url="https://man-new-test-site.netlify.app/paid-publications")
+                                  amount=publication_amount, buyer_obj=buyer_obj, callback_url="https://manufacturersnigeria.org/paid-publications")
 
 
 class ViewPublicationPDF(generics.GenericAPIView):

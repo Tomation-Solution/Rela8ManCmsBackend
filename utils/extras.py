@@ -174,8 +174,8 @@ def initialize_paystack_payment(reason_for_payment, amount, buyer_obj, callback_
     if settings.PAYSTACK_SECRET_KEY is None:
         return custom_response.Response(data={"message": "Oops invalid keys, please try again"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    if callback_url == None:
-        callback_url = "https://man-new-test-site.netlify.app/"
+    # if callback_url == None:
+    callback_url = "https://manufacturersnigeria.org"
 
     url = 'https://api.paystack.co/transaction/initialize/'
     headers = {
@@ -209,8 +209,8 @@ def initialize_flutterwave_payment(reason_for_payment, amount, buyer_obj, callba
     if settings.FLUTTERWAVE_SECRET_KEY is None:
         return custom_response.Response(data={"message": "Oops invalid keys, please try again"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    if callback_url == None:
-        callback_url = "https://man-new-test-site.netlify.app/"
+    # if callback_url == None:
+    callback_url = "https://manufacturersnigeria.org/"
 
     url = 'https://api.flutterwave.com/v3/payments'
 
