@@ -5,8 +5,8 @@ from payments.specific_views import flutterwave_views
 
 urlpatterns = [
     # WEBHOOKS
-    path("webhook", views.paystack_webhook, name="webhook"),
-    path("flutterwave-webhook", flutterwave_views.flutterwave_webhook,
+    path("webhook/", views.paystack_webhook, name="webhook"),
+    path("flutterwave-webhook/", flutterwave_views.flutterwave_webhook,
          name="flutterwave-webhook"),
     # WEBHOOKS
 
