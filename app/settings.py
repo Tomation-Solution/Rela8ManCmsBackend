@@ -13,6 +13,8 @@ from urllib.parse import urlparse
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -188,7 +190,7 @@ else:
             "PASSWORD": db_info.password,
             "HOST": db_info.hostname,
             "PORT": db_info.port,
-            "OPTIONS": {"sslmode": "require"},
+            # "OPTIONS": {"sslmode": "require"},
             "CONN_MAX_AGE": 60,
         }
     }
