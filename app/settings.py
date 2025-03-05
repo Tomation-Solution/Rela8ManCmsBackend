@@ -112,7 +112,10 @@ REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "errors",
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    # Pagination settings
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Default pagination class
+    'PAGE_SIZE': 5,  # Number of items per page
 }
 
 AUTH_USER_MODEL = "authentication.User"
