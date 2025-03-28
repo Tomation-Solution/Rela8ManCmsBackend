@@ -3,8 +3,7 @@ from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 
 class AGMHomepageCMS(models.Model):
-    main_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    main_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     intro_text = models.TextField()
     location = models.TextField()
 
@@ -15,16 +14,13 @@ class AGMHomepageCMS(models.Model):
     intro_description = models.TextField()
 
     exhibition_text = models.CharField(max_length=300)
-    exhibition_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    exhibition_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
 
     save_date_text = models.CharField(max_length=300)
-    save_date_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    save_date_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
 
     venue_text = models.CharField(max_length=300)
-    venue_text_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    venue_text_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -35,8 +31,7 @@ class AGMHomepageCMS(models.Model):
 
 
 class AGMProgrammeCMS(models.Model):
-    main_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    main_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     main_text = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,12 +44,17 @@ class AGMProgrammeCMS(models.Model):
 
 class AGMPrograms(models.Model):
     program_date = models.DateField()
-    program_title = models.CharField(unique=True)
+    program_title = models.CharField(
+        unique=True,
+        max_length=500,
+    )
     program_attached_file_link = models.URLField(blank=True, null=True)
     program_attached_file1 = models.FileField(
-        storage=RawMediaCloudinaryStorage, blank=True, null=True)
+        storage=RawMediaCloudinaryStorage, blank=True, null=True
+    )
     program_attached_file2 = models.FileField(
-        storage=RawMediaCloudinaryStorage, blank=True, null=True)
+        storage=RawMediaCloudinaryStorage, blank=True, null=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -71,8 +71,7 @@ class AGMSpeakers(models.Model):
     speaker_title = models.CharField(max_length=300, blank=True, null=True)
     speaker_name = models.CharField(max_length=300)
     extra_title = models.CharField(max_length=300, blank=True, null=True)
-    speaker_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    speaker_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     speaker_words = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -84,8 +83,7 @@ class AGMSpeakers(models.Model):
 
 
 class AGMVenue(models.Model):
-    venue_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    venue_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     venue_location_text = models.TextField()
     venue_location_map = models.TextField()
 
@@ -98,8 +96,7 @@ class AGMVenue(models.Model):
 
 
 class AGMExhibitionCMS(models.Model):
-    main_image = models.ImageField(
-        upload_to="images/agm/", blank=True, null=True)
+    main_image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     intro_text = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -111,10 +108,7 @@ class AGMExhibitionCMS(models.Model):
 
 
 class AGMPreviousExhibitionAndCompanyImages(models.Model):
-    image_type = [
-        ("exhibition", "exhibition"),
-        ("company", "company")
-    ]
+    image_type = [("exhibition", "exhibition"), ("company", "company")]
 
     image = models.ImageField(upload_to="images/agm/", blank=True, null=True)
     type = models.CharField(max_length=100, choices=image_type)

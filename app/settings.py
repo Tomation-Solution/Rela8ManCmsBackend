@@ -9,11 +9,13 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 from urllib.parse import urlparse
 from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+
 load_dotenv()  # Load environment variables from .env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,26 +31,30 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG_VALUE")
 
-ALLOWED_HOSTS = ["*",]
+DEVELOPMENT_ENV = os.environ.get("DEVELOPMENT_ENV")
+
+ALLOWED_HOSTS = [
+    "*",
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
-    'cloudinary_storage',
-    'cloudinary',
+    "cloudinary_storage",
+    "cloudinary",
     # user defined apps
-    'authentication',
+    "authentication",
     "publications",
     "news",
     "gallery",
@@ -63,35 +69,40 @@ INSTALLED_APPS = [
     "agmcms",
     # MAILING
     "anymail",
-    'homepage',
-
+    "homepage",
 ]
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
+trusted_origins = os.getenv("TRUSTED_ALLOWED_ORIGINS_HOST", "").strip()
 
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "TRUSTED_ALLOWED_ORIGINS_HOST").split(",")
+# Ensure it's not empty before splitting
+if trusted_origins:
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip() for origin in trusted_origins.split(",") if origin.strip()
+    ]
+    CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+else:
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
 
 CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -99,23 +110,22 @@ CORS_ALLOW_CREDENTIALS = True
 # cloudinary setup
 # SET ENVIRONMENT VARIABLES
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get(
-        'CLOUDINARY_API_SECRET'),
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "errors",
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     # Pagination settings
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Default pagination class
-    'PAGE_SIZE': 5,  # Number of items per page
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",  # Default pagination class
+    "PAGE_SIZE": 5,  # Number of items per page
 }
 
 AUTH_USER_MODEL = "authentication.User"
@@ -126,77 +136,81 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
 ]
 
-ROOT_URLCONF = 'app.urls'
+ROOT_URLCONF = "app.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'app.wsgi.application'
+WSGI_APPLICATION = "app.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = dict()
-DATABASE_URL = os.environ.get('DATABASE_URL', None)
+DATABASE_URL = os.environ.get("DATABASE_URL", None)
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-if not DATABASE_URL:
+# Dev Mode Database
+if DEVELOPMENT_ENV == "True":
     DATABASES = {
         "default": {
-            "ENGINE": 'django.db.backends.postgresql',
-            "NAME": os.environ.get("DB_NAME"),
-            "USER":  os.environ.get("DB_USER"),
-            "PASSWORD":  os.environ.get("DB_PASS"),
-            "HOST":  os.environ.get("DB_HOST"),
-            "PORT":  os.environ.get("DB_PORT"),
-            "CONN_MAX_AGE": 60,
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-else:
-    db_info = urlparse(DATABASE_URL)
-    DATABASES = {
-        "default": {
-            "ENGINE": 'django.db.backends.postgresql',
-            "NAME": db_info.path[1:],
-            "USER": db_info.username,
-            "PASSWORD": db_info.password,
-            "HOST": db_info.hostname,
-            "PORT": db_info.port,
-            # "OPTIONS": {"sslmode": "require"},
-            "CONN_MAX_AGE": 60,
+
+# Production Mode Database
+if not DEVELOPMENT_ENV == "True":
+    if not DATABASE_URL:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": os.environ.get("DB_NAME"),
+                "USER": os.environ.get("DB_USER"),
+                "PASSWORD": os.environ.get("DB_PASS"),
+                "HOST": os.environ.get("DB_HOST"),
+                "PORT": os.environ.get("DB_PORT"),
+                "CONN_MAX_AGE": 60,
+            }
         }
-    }
+    else:
+        db_info = urlparse(DATABASE_URL)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": db_info.path[1:],
+                "USER": db_info.username,
+                "PASSWORD": db_info.password,
+                "HOST": db_info.hostname,
+                "PORT": db_info.port,
+                # "OPTIONS": {"sslmode": "require"},
+                "CONN_MAX_AGE": 60,
+            }
+        }
 
 
 # Password validation
@@ -204,16 +218,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -221,9 +235,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Africa/Lagos'
+TIME_ZONE = "Africa/Lagos"
 
 USE_I18N = True
 
@@ -232,20 +246,20 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # SENDIN BLUE MAILING SERVICES
@@ -253,8 +267,8 @@ SENDINBLUE_API_KEY = os.environ.get("SENDINBLUE_KEY")
 
 # EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
 
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
-DEFAULT_FROM_NAME = os.environ.get('EMAIL_HOST_NAME')
+DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_HOST_USER")
+DEFAULT_FROM_NAME = os.environ.get("EMAIL_HOST_NAME")
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 

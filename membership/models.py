@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+
 # Create your models here.
 
 
@@ -38,8 +39,7 @@ class FAQs(models.Model):
 
 
 class HomePage(models.Model):
-    writer = models.OneToOneField(
-        to=User, on_delete=models.SET_NULL, null=True)
+    writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     Logo = models.ImageField(blank=True, null=True, default=None)
     slider_welcome_message = models.CharField(max_length=255)
     slider_vision_message = models.CharField(max_length=255)
@@ -61,8 +61,7 @@ class HomePage(models.Model):
 
 
 class WhyWeAreUnique(models.Model):
-    writer = models.ForeignKey(
-        to=User, on_delete=models.SET_NULL, null=True)
+    writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(default=None, blank=True, null=True)
     heading = models.CharField(max_length=300)
     description = models.TextField()
@@ -75,8 +74,7 @@ class OurMembers(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=300)
     website = models.URLField(blank=True, null=True)
-    description = models.TextField(
-        blank=True, null=True, default="A Member of Man")
+    description = models.TextField(blank=True, null=True, default="A Member of Man")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
@@ -89,9 +87,8 @@ class OurMembers(models.Model):
 
 
 class Advertisement(models.Model):
-    image = models.ImageField(
-        upload_to="images/advert/", blank=True, null=True)
-    text = models.CharField()
+    image = models.ImageField(upload_to="images/advert/", blank=True, null=True)
+    text = models.TextField(null=False, blank=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
