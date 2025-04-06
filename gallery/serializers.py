@@ -11,16 +11,26 @@ class GalleryItemsSerializer(serializers.Serializer):
 
 class GallerySerializer(serializers.ModelSerializer):
     images = GalleryItemsSerializer(
-        many=True, write_only=True, required=True, allow_empty=False)
+        many=True, write_only=True, required=True, allow_empty=False
+    )
     gallery_images = serializers.SerializerMethodField()
 
     def get_gallery_images(self, instance):
-        gallery_images = GalleryItems.objects.filter(
-            gallery=instance)
+        request = self.context.get("request")  # Get request context
+        gallery_images = GalleryItems.objects.filter(gallery=instance)
         list_of_images = []
+
         for i in gallery_images:
+            image_url = i.image.url
+            if request:
+                image_url = request.build_absolute_uri(
+                    i.image.url
+                )  # Convert to full URL
+
             list_of_images.append(
-                {"id": i.id, "caption": i.caption, "image": i.image.url})
+                {"id": i.id, "caption": i.caption, "image": image_url}
+            )
+
         return list_of_images
 
     def create(self, validated_data):
@@ -28,8 +38,9 @@ class GallerySerializer(serializers.ModelSerializer):
         gallery = Gallery.objects.create(**validated_data)
 
         for item in list_of_images:
-            GalleryItems.objects.create(gallery=gallery, caption=item.get(
-                "caption"), image=item.get("image"))
+            GalleryItems.objects.create(
+                gallery=gallery, caption=item.get("caption"), image=item.get("image")
+            )
 
         return gallery
 
@@ -46,7 +57,8 @@ class GalleryItemSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(required=True)
     image = serializers.ImageField(required=True)
     gallery = serializers.PrimaryKeyRelatedField(
-        queryset=Gallery.objects.all(), allow_null=False, required=False)
+        queryset=Gallery.objects.all(), allow_null=False, required=False
+    )
 
     class Meta:
         model = GalleryItems

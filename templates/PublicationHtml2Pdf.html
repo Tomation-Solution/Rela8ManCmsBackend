@@ -8,64 +8,147 @@
 
     <style>
         @page {
-            size: a4 portrait;
-            @frame header_frame {           /* Static Frame */
+            size: A4 portrait;
+            margin: 1in;
+            @frame header_frame {
                 -pdf-frame-content: header_content;
-                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+                left: 50pt; width: 512pt; top: 30pt; height: 30pt;
             }
-            @frame content_frame {          /* Content Frame */
-                left: 50pt; width: 512pt; top: 90pt; height: 632pt;
-            }
-            @frame footer_frame {           /* Another static Frame */
+            @frame footer_frame {
                 -pdf-frame-content: footer_content;
-                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+                left: 50pt; width: 512pt; top: 800pt; height: 20pt;
             }
         }
-        body{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family: 'sans-serif',Courier, monospace;
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .header, .footer {
+            text-align: center;
+            font-size: 10pt;
+            color: #888888;
+        }
+
+        h1, h2, h3, h4 {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+        }
+
+        h1 {
+            font-size: 20pt;
+            text-align: center;
+            margin-top: 10pt;
+        }
+
+        h2 {
+            font-size: 18pt;
+            margin-top: 20pt;
+        }
+
+        h3 {
+            font-size: 16pt;
+            margin-top: 10pt;
+        }
+
+        h4 {
+            font-size: 14pt;
+            margin-top: 10pt;
+        }
+
+        p {
+            font-size: 12pt;
+            margin-bottom: 10pt;
+            text-align: justify;
+        }
+
+        .publication-content {
+            margin-top: 20pt;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20pt 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .footer-content {
+            font-size: 10pt;
+            text-align: center;
+            margin-top: 10pt;
+        }
+
+        .citation {
+            font-size: 12pt;
+            margin-top: 20pt;
+            text-align: justify;
+        }
+
+        .link {
+            font-size: 12pt;
+            color: #1a0dab;
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <!-- Content for Static Frame 'header_frame' -->
+    <!-- Header Content -->
     <div id="header_content">
         <h1>MAN Paid Publication</h1>
     </div>
 
-    <!-- Content for Static Frame 'footer_frame' -->
-    <div id="footer_content">(c) - page <pdf:pagenumber>
-        of <pdf:pagecount>
+    <!-- Footer Content -->
+    <div id="footer_content">
+        <div class="footer-content">
+            (c) - page <pdf:pagenumber> of <pdf:pagecount>
+        </div>
     </div>
 
-    <h2 style="font-size:16px;">Title: {{title}}</h2>
-    <h4 style="font-size:16px;">Name: {{name}}</h4>
+    <!-- Main Content -->
+    <h2>Title: {{title}}</h2>
+    <p><strong>Written On:</strong> {{created_at}}</p>
+    <p><strong>Publication Type:</strong> {{publications_type}}</p>
 
-    <div>
-        <img src="{{image.url}}" alt="Publication Preview Image" style="height: 300px;"/>
+    <!-- Publication Content Section -->
+    <div class="publication-content">
+        <h3>Publication Content:</h3>
+        <p>{{publication_content|safe}}</p> <!-- Raw HTML or Text -->
     </div>
-    
-    <div>
-        <h5 style="font-size:14px;">Written On: {{created_at}}</h5>
-        <h5 style="font-size:14px;">Publication Type: {{publications_type}}</h5>
 
-        {% if details %}
+    <!-- Additional Details Section -->
+    {% if details %}
+        <div>
             {% for detail in details %}
-                <h3 style="font-size:16px; margin:0; padding:0;">{{detail.header}}</h3>
-                <p style="font-size:14px; margin:0; padding:0;">{{detail.value}}</p>
+                <h4>{{detail.header}}</h4>
+                <p>{{detail.value}}</p>
             {% endfor %}
-        {% else %} 
-            <p>This publication contains no details</p>
-        {% endif %}
-        <br />
-        <a href="{{read_more_link}}" style="font-size:16px; font-weight:700; margin-top:20px;">Read more or download link one</a>
-        <br />
-        <br />
-        <a href="{{read_more_link_2}}" style="font-size:16px; font-weight:700; margin-top:20px;">Read more or download link two</a>
-    </div>
-</body>
+        </div>
+    {% else %}
+        <p>This publication contains no additional details.</p>
+    {% endif %}
 
+    <!-- Links to Read More or Download -->
+    {% if read_more_link %}
+        <p>
+            <a href="{{read_more_link}}" class="link">Read more or download link</a>
+        </p>
+    {% endif %} 
+
+    {% if attachment_link %}
+        <p>
+            <a href="{{attachment_link}}" class="link">Attachment or download link</a>
+        </p>
+    {% endif %}
+
+</body>
 </html>

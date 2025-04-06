@@ -3,7 +3,5 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 route = DefaultRouter()
-route.register('add-slider',views.HomePageSliderViewset)
-urlpatterns =[
-
-] + route.urls
+route.register("add-slider", views.HomePageSliderViewset, basename="homepageslider")
+urlpatterns = [] + route.urls

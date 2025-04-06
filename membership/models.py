@@ -45,16 +45,19 @@ class HomePage(models.Model):
     slider_vision_message = models.CharField(max_length=255)
     slider_mission_message = models.CharField(max_length=255)
 
-    vision_intro = models.JSONField()
-    mission_intro = models.JSONField()
-    advocacy_intro = models.JSONField()
-    history_intro = models.JSONField()
-    why_join_intro = models.JSONField()
-    members_intro = models.JSONField()
+    vision_intro = models.TextField()
+    mission_intro = models.TextField()
+    advocacy_intro = models.TextField()
+    history_intro = models.TextField()
+    why_join_intro = models.TextField()
+    members_intro = models.TextField()
 
     slider_image1 = models.ImageField(blank=True, null=True, default=None)
     slider_image2 = models.ImageField(blank=True, null=True, default=None)
     slider_image3 = models.ImageField(blank=True, null=True, default=None)
+
+    history_image = models.ImageField(blank=True, null=True, default=None)
+    join_man_image = models.ImageField(blank=True, null=True, default=None)
 
     def __str__(self) -> str:
         return f"Home page main: {self.id}"

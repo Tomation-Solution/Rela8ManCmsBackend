@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publication Payments</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        margin: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #2b3513;
+      }
+
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        word-wrap: break-word;
+      }
+
+      thead {
+        background-color: #2b3513;
+        color: white;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        font-size: 11px;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 20mm;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Publication Payments</h1>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Publication Title</th>
+            <th>Amount Paid</th>
+            <th>Payment Ref</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Payment Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in publication_payments %}
+          <tr>
+            <td>{{ payment.fullname }}</td>
+            <td>{{ payment.email }}</td>
+            <td>{{ payment.phone_number }}</td>
+            <td>{{ payment.publication.title }}</td>
+            <td>{{ payment.payment.amount }}</td>
+            <td>{{ payment.payment.payment_ref }}</td>
+            <td>{{ payment.payment.payment_method }}</td>
+            <td>{{ payment.payment.status }}</td>
+            <td>{{ payment.payment.created_at|date:"Y-m-d H:i:s" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">Generated on {{ now|date:"Y-m-d H:i" }}</div>
+  </body>
+</html>

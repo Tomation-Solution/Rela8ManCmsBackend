@@ -16,11 +16,11 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_path = os.path.join(BASE_DIR, ".env")
 
+load_dotenv(env_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -135,6 +135,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
 }
 
+CSRF_COOKIE_SECURE = True
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -176,12 +178,27 @@ DATABASE_URL = os.environ.get("DATABASE_URL", None)
 
 # Dev Mode Database
 if DEVELOPMENT_ENV == "True":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+    if DATABASE_URL:
+        db_info = urlparse(DATABASE_URL)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": db_info.path[1:],
+                "USER": db_info.username,
+                "PASSWORD": db_info.password,
+                "HOST": db_info.hostname,
+                "PORT": db_info.port,
+                # "OPTIONS": {"sslmode": "require"},
+                "CONN_MAX_AGE": 60,
+            }
         }
-    }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 
 # Production Mode Database
 if not DEVELOPMENT_ENV == "True":

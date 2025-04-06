@@ -1,5 +1,9 @@
-from rest_framework import generics, permissions
-from services.serializers import AllServicesSerializer, RequestServiceSerializer, SubscribeToNewsLetterSerializer
+from rest_framework import generics, permissions, status
+from services.serializers import (
+    AllServicesSerializer,
+    RequestServiceSerializer,
+    SubscribeToNewsLetterSerializer,
+)
 from services.models import RequestService, SubscribeToNewsLetter, AllServices
 from utils.tokens_handler import generate_token, decode_token
 from django.contrib.sites.shortcuts import get_current_site
@@ -10,6 +14,11 @@ import jwt
 from django.forms.models import model_to_dict
 from django.template.loader import render_to_string
 from django.shortcuts import render
+from rest_framework.parsers import FormParser
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 # Create your views here.
 
 
@@ -24,7 +33,9 @@ class RequestServiceView(generics.GenericAPIView):
         all_requests = self.get_queryset()
         serializer = self.serializer_class(all_requests, many=True)
 
-        return custom_response.Success_response(msg="all service request", data=serializer.data)
+        return custom_response.Success_response(
+            msg="all service request", data=serializer.data
+        )
 
     def post(self, request):
         request_data = request.data
@@ -35,12 +46,14 @@ class RequestServiceView(generics.GenericAPIView):
         request_serialized = serializer.data
 
         request_obj = RequestService.objects.get(
-            email=request_serialized["email"], ref=request_serialized["ref"])
+            email=request_serialized["email"], ref=request_serialized["ref"]
+        )
 
         request_obj = model_to_dict(request_obj)
 
         token = generate_token(
-            {"name": request_obj["name"], "email": request_obj["email"]})
+            {"name": request_obj["name"], "email": request_obj["email"]}
+        )
         ref_no = request_obj["ref"]
 
         # setting up domain getting object
@@ -49,18 +62,32 @@ class RequestServiceView(generics.GenericAPIView):
         # redirect to our verify-email view
         relativePath = reverse("verify-request")
 
-        absUrl = "http://"+current_site+relativePath + \
-            "?token="+str(token)+"&ref="+str(ref_no)
+        absUrl = (
+            "http://"
+            + current_site
+            + relativePath
+            + "?token="
+            + str(token)
+            + "&ref="
+            + str(ref_no)
+        )
         email_subject = "Service Request Email Verification"
 
-        html_message = render_to_string('RequestServiceMail.html', {
-                                        'redirect_url': absUrl, 'client_mail': request_obj["email"]})
+        html_message = render_to_string(
+            "RequestServiceMail.html",
+            {"redirect_url": absUrl, "client_mail": request_obj["email"]},
+        )
 
         # my send mail utility class
-        mailer.sib_send_mail(to=[{"email": request_obj["email"], "name":request_obj["email"]}],
-                             html_content=html_message, subject=email_subject)
+        mailer.sib_send_mail(
+            to=[{"email": request_obj["email"], "name": request_obj["email"]}],
+            html_content=html_message,
+            subject=email_subject,
+        )
 
-        return custom_response.Success_response(msg="mail successfully sent", data=request_serialized)
+        return custom_response.Success_response(
+            msg="mail successfully sent", data=request_serialized
+        )
 
 
 class VerifyServiceRequestEmailView(generics.GenericAPIView):
@@ -71,20 +98,41 @@ class VerifyServiceRequestEmailView(generics.GenericAPIView):
         try:
             payload = decode_token(token=token)
             serviceRequest: RequestService = RequestService.objects.get(
-                email=payload["email"], name=payload["name"], ref=ref_no)
+                email=payload["email"], name=payload["name"], ref=ref_no
+            )
 
             if not serviceRequest.is_verified:
                 serviceRequest.is_verified = True
                 serviceRequest.save()
-                return render(request, "ConfirmationPage.html", context={'message': 'service request email verified'})
-            return render(request, "ConfirmationPage.html", context={'message': 'service request email verified'})
+                return render(
+                    request,
+                    "ConfirmationPage.html",
+                    context={"message": "service request email verified"},
+                )
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "service request email verified"},
+            )
 
         except jwt.ExpiredSignatureError as err:
-            return render(request, "ConfirmationPage.html", context={'message': 'Activation Token Expired'})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Activation Token Expired"},
+            )
         except jwt.exceptions.DecodeError as err:
-            return render(request, "ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Invalid token, request a new one"},
+            )
         except:
-            return render(request, "ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Invalid token, Something went wrong"},
+            )
 
 
 class SubscribeToNewsLetterVIew(generics.GenericAPIView):
@@ -98,7 +146,9 @@ class SubscribeToNewsLetterVIew(generics.GenericAPIView):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
 
-        return custom_response.Success_response(msg="all newletter subscribers", data=serializer.data)
+        return custom_response.Success_response(
+            msg="all newletter subscribers", data=serializer.data
+        )
 
     def post(self, request):
         email = request.data
@@ -109,30 +159,44 @@ class SubscribeToNewsLetterVIew(generics.GenericAPIView):
         request_serialized = serializer.data
 
         request_obj = SubscribeToNewsLetter.objects.get(
-            email=request_serialized["email"], ref=request_serialized['ref'])
+            email=request_serialized["email"], ref=request_serialized["ref"]
+        )
 
         request_obj = model_to_dict(request_obj)
 
-        token = generate_token(
-            {"email": request_obj['email']})
-        ref_no = request_obj['ref']
+        token = generate_token({"email": request_obj["email"]})
+        ref_no = request_obj["ref"]
 
         current_site = get_current_site(request).domain
 
         relativePath = reverse("newsletter-email-verification")
 
-        absUrl = "http://"+current_site+relativePath + \
-            "?token="+str(token)+"&ref="+str(ref_no)
+        absUrl = (
+            "http://"
+            + current_site
+            + relativePath
+            + "?token="
+            + str(token)
+            + "&ref="
+            + str(ref_no)
+        )
         email_subject = "MAN newsletter email verification"
 
-        html_message = render_to_string('NewLetterSubscriptionMail.html', {
-                                        'redirect_url': absUrl, 'client_mail': request_obj["email"]})
+        html_message = render_to_string(
+            "NewLetterSubscriptionMail.html",
+            {"redirect_url": absUrl, "client_mail": request_obj["email"]},
+        )
 
         # my send mail utility class
-        mailer.sib_send_mail(to=[{"email": request_obj["email"], "name":request_obj["email"]}],
-                             html_content=html_message, subject=email_subject)
+        mailer.sib_send_mail(
+            to=[{"email": request_obj["email"], "name": request_obj["email"]}],
+            html_content=html_message,
+            subject=email_subject,
+        )
 
-        return custom_response.Success_response(msg="mail successfully sent", data=request_serialized)
+        return custom_response.Success_response(
+            msg="mail successfully sent", data=request_serialized
+        )
 
 
 class VerifyNewsletterEmailView(generics.GenericAPIView):
@@ -142,39 +206,83 @@ class VerifyNewsletterEmailView(generics.GenericAPIView):
 
         try:
             payload = decode_token(token=token)
-            newLetterSubscription: SubscribeToNewsLetter = SubscribeToNewsLetter.objects.get(
-                email=payload["email"], ref=ref)
+            newLetterSubscription: SubscribeToNewsLetter = (
+                SubscribeToNewsLetter.objects.get(email=payload["email"], ref=ref)
+            )
 
             if not newLetterSubscription.is_verified:
                 newLetterSubscription.is_verified = True
                 newLetterSubscription.save()
-                return render(request, "ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
+                return render(
+                    request,
+                    "ConfirmationPage.html",
+                    context={"message": "successfully subscribed to man newsletter"},
+                )
 
-            return render(request, "ConfirmationPage.html", context={'message': 'successfully subscribed to man newsletter'})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "successfully subscribed to man newsletter"},
+            )
 
         except jwt.ExpiredSignatureError as err:
-            return render(request, "ConfirmationPage.html", context={'message': 'Activation Token Expired'})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Activation Token Expired"},
+            )
         except jwt.exceptions.DecodeError as err:
-            return render(request, "ConfirmationPage.html", context={'message': "Invalid token, request a new one"})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Invalid token, request a new one"},
+            )
         except:
-            return render(request, "ConfirmationPage.html", context={"message": "Invalid token, Something went wrong"})
+            return render(
+                request,
+                "ConfirmationPage.html",
+                context={"message": "Invalid token, Something went wrong"},
+            )
 
 
-class AllServicesView(generics.ListCreateAPIView):
-    serializer_class = AllServicesSerializer
+class AllServicesPagination(PageNumberPagination):
+    page_size = 10  # Set the number of items per page
+    page_size_query_param = "page_size"  # Allow clients to specify page size
+    max_page_size = 50  # Limit the max results per page
+
+
+class AllServicesView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [custom_parsers.NestedMultipartParser, FormParser]
+    pagination_class = AllServicesPagination
 
-    def get_queryset(self):
-        return AllServices.objects.all()
+    def get(self, request):
+        queryset = AllServices.objects.all().order_by("-id")  # Order latest first
 
-    def perform_create(self, serializer):
-        return serializer.save(writer=self.request.user)
+        # Apply pagination
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
 
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(data=serializer.data, msg="services")
+        serializer = AllServicesSerializer(
+            paginated_queryset, many=True, context={"request": request}
+        )
+        return paginator.get_paginated_response(
+            {"msg": "services", "data": serializer.data}
+        )
+
+    def post(self, request):
+        serializer = AllServicesSerializer(
+            data=request.data, context={"request": request}
+        )
+
+        if serializer.is_valid():
+            serializer.save(writer=request.user)
+            return Response(
+                {"msg": "Service created successfully", "data": serializer.data},
+                status=status.HTTP_201_CREATED,
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AllServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -185,6 +293,7 @@ class AllServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return AllServices.objects.all()
+
 
 # PUBLIC VIEWS
 
