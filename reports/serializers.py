@@ -8,15 +8,22 @@ class ReportsParagraphSerializer(serializers.Serializer):
 
 
 class ReportsSerializer(serializers.ModelSerializer):
-    details = ReportsParagraphSerializer(
-        many=True, required=True, allow_empty=False)
-    readmore_link = serializers.URLField(required=False, allow_blank=True)
+    image = serializers.ImageField(required=False)
     link = serializers.FileField(required=False)
-
-    def create(self, validated_data):
-        report = Reports.objects.create(**validated_data)
-        return report
+    readmore_link = serializers.URLField(required=False, allow_blank=True)
 
     class Meta:
         model = Reports
         exclude = ["writer"]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        writer = request.user if request else None
+        return Reports.objects.create(writer=writer, **validated_data)
+
+    def update(self, instance, validated_data):
+        # Only update fields if they are in the request data
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

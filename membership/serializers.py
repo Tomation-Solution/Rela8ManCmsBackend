@@ -1,5 +1,13 @@
 from rest_framework import serializers, exceptions
-from membership.models import WhyJoinMan, JoiningStep, FAQs, HomePage, WhyWeAreUnique, OurMembers, Advertisement
+from membership.models import (
+    WhyJoinMan,
+    JoiningStep,
+    FAQs,
+    HomePage,
+    WhyWeAreUnique,
+    OurMembers,
+    Advertisement,
+)
 
 
 class WhyJoinManSerializers(serializers.ModelSerializer):
@@ -32,24 +40,37 @@ class FAQsSerializer(serializers.ModelSerializer):
 
 class HomePageSerializer(serializers.ModelSerializer):
     Logo = serializers.ImageField(required=False)
-    slider_welcome_message = serializers.CharField(required=True)
-    slider_vision_message = serializers.CharField(required=True)
-    slider_mission_message = serializers.CharField(required=True)
-
-    vision_intro = serializers.JSONField(required=True)
-    mission_intro = serializers.JSONField(required=True)
-    advocacy_intro = serializers.JSONField(required=True)
-    history_intro = serializers.JSONField(required=True)
-    why_join_intro = serializers.JSONField(required=True)
-    members_intro = serializers.JSONField(required=True)
-
     slider_image1 = serializers.ImageField(required=False)
     slider_image2 = serializers.ImageField(required=False)
     slider_image3 = serializers.ImageField(required=False)
+    history_image = serializers.ImageField(required=False)
+    join_man_image = serializers.ImageField(required=False)
 
     class Meta:
         model = HomePage
         exclude = ["writer"]
+
+    def get_image_url(self, instance, field_name):
+        request = self.context.get("request")
+        image = getattr(instance, field_name)
+        return request.build_absolute_uri(image.url) if image and request else None
+
+    def to_representation(self, instance):
+        """Override to return full URLs for image fields"""
+        data = super().to_representation(instance)
+        image_fields = [
+            "Logo",
+            "slider_image1",
+            "slider_image2",
+            "slider_image3",
+            "history_image",
+            "join_man_image",
+        ]
+
+        for field in image_fields:
+            data[field] = self.get_image_url(instance, field)
+
+        return data
 
 
 class WhyWeAreUniqueSerializer(serializers.ModelSerializer):
@@ -73,8 +94,7 @@ class AdvertismentViewSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         number_of_adverts = Advertisement.objects.count()
         if number_of_adverts >= 3:
-            raise exceptions.ValidationError(
-                "maximum of three adds can be created")
+            raise exceptions.ValidationError("maximum of three adds can be created")
         return super().validate(attrs)
 
     class Meta:

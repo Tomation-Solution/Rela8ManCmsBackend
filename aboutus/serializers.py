@@ -11,59 +11,119 @@ class AboutContactUsSerializer(serializers.ModelSerializer):
 
 
 class AboutHistorySerializer(serializers.ModelSerializer):
-    history_paragraphs = serializers.JSONField(required=True)
-    core_values = serializers.JSONField(required=True)
-    vision = serializers.JSONField(required=True)
-    mission = serializers.JSONField(required=True)
-    objectives = serializers.JSONField(required=True)
-    extras = serializers.JSONField(required=True)
+    main_image = serializers.ImageField(required=False)
+    history_image = serializers.ImageField(required=False)
+    mission_image = serializers.ImageField(required=False)
+    vision_image = serializers.ImageField(required=False)
 
     class Meta:
         model = models.AboutHistory
         exclude = ["writer"]
 
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in [
+            "main_image",
+            "history_image",
+            "mission_image",
+            "vision_image",
+        ]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
+
 
 class AboutAdvocacySerializer(serializers.ModelSerializer):
-    main_achievements = serializers.JSONField(required=True)
+    main_image = serializers.ImageField(required=False)
 
     class Meta:
         model = models.AboutAdvocacy
         exclude = ["writer"]
 
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in [
+            "main_image",
+        ]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
+
 
 class AboutAffilliateSerializer(serializers.ModelSerializer):
-    ops = serializers.JSONField(required=True)
-    international_partners = serializers.JSONField(required=True)
+    main_image = serializers.ImageField(required=False)
 
     class Meta:
         model = models.AboutAffilliate
         exclude = ["writer"]
 
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in [
+            "main_image",
+        ]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
+
 
 class AboutHowWeWorkSerializer(serializers.ModelSerializer):
-    how_we_work = serializers.JSONField(required=True)
-    how_we_work_details = serializers.JSONField(required=True)
-    committees = serializers.JSONField(required=True)
-    committee_details = serializers.JSONField(required=True)
-    adhoc = serializers.JSONField(required=True)
-    spvehicles = serializers.JSONField(required=True)
-    spgroups = serializers.JSONField(required=True)
-    conduct = serializers.JSONField(required=True)
-    conduct_listing = serializers.JSONField(required=True)
+    main_image = serializers.ImageField(required=False)
 
     class Meta:
         model = models.AboutHowWeWork
         exclude = ["writer"]
 
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in [
+            "main_image",
+        ]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
+
 
 class AboutWhereWeOperateSerializer(serializers.ModelSerializer):
-    national_secretariat = serializers.CharField(required=True)
-    coorprate_office = serializers.CharField(required=True)
-    branch_text = serializers.CharField(required=True)
+    main_image = serializers.ImageField(required=False)
 
     class Meta:
         model = models.AboutWhereWeOperate
         exclude = ["writer"]
+
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in [
+            "main_image",
+        ]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
 
 
 class AboutWhereWeOperateOfficeSerializer(serializers.ModelSerializer):
@@ -92,12 +152,18 @@ class AboutWhereWeOperateBranchSerializer(serializers.ModelSerializer):
 
 class AboutOurExecutivesSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
-    name = serializers.CharField(required=True)
-    title = serializers.CharField(required=True)
-    extra_title1 = serializers.CharField(required=False)
-    extra_title2 = serializers.CharField(required=False)
-    type = serializers.CharField(required=True)
-    tenor = serializers.CharField(required=False, allow_blank=True)
+
+    def to_representation(self, instance):
+        """Ensure images return full URLs in response."""
+        request = self.context.get("request")
+        representation = super().to_representation(instance)
+
+        for image_field in ["image"]:
+            image = getattr(instance, image_field)
+            if image and request:
+                representation[image_field] = request.build_absolute_uri(image.url)
+
+        return representation
 
     class Meta:
         model = models.AboutOurExecutives

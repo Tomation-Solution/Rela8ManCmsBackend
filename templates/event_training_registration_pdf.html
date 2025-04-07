@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Event and Training Registrations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+          }
+    
+          h1 {
+            text-align: center;
+            color: #2b3513;
+          }
+    
+          .table-container {
+            width: 100%;
+            overflow-x: auto;
+          }
+    
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            word-wrap: break-word;
+          }
+    
+          thead {
+            background-color: #2b3513;
+            color: white;
+          }
+    
+          th,
+          td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+          }
+    
+          @page {
+            size: A4 landscape;
+            margin: 20mm;
+          }
+    </style>
+  </head>
+    <h1>{{ option_text }}</h1>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Company Name</th>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for registration in event_trainings %}
+          <tr>
+            <td>{{ registration.fullname }}</td>
+            <td>{{ registration.email }}</td>
+            <td>{{ registration.company_name }}</td>
+            <td>
+                {% if registration.training %}
+                  {{ registration.training.name }}
+                {% elif registration.event %}
+                  {{ registration.event.name }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+            <td>{{ registration.amount_to_pay }}</td>
+            <td>{{ registration.payment.payment_method }}</td>
+            <td>{{ registration.payment.status }}</td>
+            <td>{{ registration.created_at }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
