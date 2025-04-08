@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
+
+from utils import mailer
 from .models import (
     Payment,
     PublicationPayment,
@@ -124,6 +126,26 @@ class PaymentRedirectView(APIView):
                     reverse("download_publication", args=[str(download_link.token)])
                 )
 
+                # Notify Admin
+                mailer.sib_send_mail(
+                    to=[
+                        {"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}
+                    ],
+                    cc=[{"email": "support@manufacturersnigeria.org"}],
+                    subject=f"New {('Publication' if 'publication' in data else data.get('event_type', 'Event'))} Payment Received",
+                    html_content=f"""
+                        <p><strong>New Payment Received</strong></p>
+                        <p><strong>Full Name:</strong> {model_data.get('fullname')}</p>
+                        <p><strong>Email:</strong> {model_data.get('email')}</p>
+                        <p><strong>Phone:</strong> {model_data.get('phone_number')}</p>
+                        <p><strong>Company:</strong> {model_data.get('company_name')}</p>
+                        <p><strong>Amount Paid:</strong> ₦{model_data.get('amount_to_pay')}</p>
+                        {"<p><strong>Publication ID:</strong> " + str(data.get("publication")) + "</p>" if "publication" in data else ""}
+                        {"<p><strong>Event Type:</strong> " + data.get("event_type") + "</p>" if "event_type" in data else ""}
+                        {"<p><strong>Event/Training ID:</strong> " + str(data.get("event")) + "</p>" if "event" in data else ""}
+                    """,
+                )
+
                 return JsonResponse(
                     {
                         "message": "Payment processed successfully.",
@@ -154,6 +176,26 @@ class PaymentRedirectView(APIView):
                     model_data["training"] = None
 
                 EventTrainingRegistration.objects.create(**model_data)
+
+                # Notify Admin
+                mailer.sib_send_mail(
+                    to=[
+                        {"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}
+                    ],
+                    cc=[{"email": "support@manufacturersnigeria.org"}],
+                    subject=f"New {('Publication' if 'publication' in data else data.get('event_type', 'Event'))} Payment Received",
+                    html_content=f"""
+                        <p><strong>New Payment Received</strong></p>
+                        <p><strong>Full Name:</strong> {model_data.get('fullname')}</p>
+                        <p><strong>Email:</strong> {model_data.get('email')}</p>
+                        <p><strong>Phone:</strong> {model_data.get('phone_number')}</p>
+                        <p><strong>Company:</strong> {model_data.get('company_name')}</p>
+                        <p><strong>Amount Paid:</strong> ₦{model_data.get('amount_to_pay')}</p>
+                        {"<p><strong>Publication ID:</strong> " + str(data.get("publication")) + "</p>" if "publication" in data else ""}
+                        {"<p><strong>Event Type:</strong> " + data.get("event_type") + "</p>" if "event_type" in data else ""}
+                        {"<p><strong>Event/Training ID:</strong> " + str(data.get("event")) + "</p>" if "event" in data else ""}
+                    """,
+                )
 
                 return JsonResponse(
                     {"message": "Payment processed successfully."},

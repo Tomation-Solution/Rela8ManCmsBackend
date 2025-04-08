@@ -4,20 +4,58 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Service Mail</title>
+    <title>Newsletter Email Verification</title>
   </head>
-  <body>
-    <h1>Hello {{client_mail}}</h1>
-    <p>
-      Please click the link below to verify your email to successfully subscribe
-      to our man newsletter.
-    </p>
-    <p>
-      <strong>NOTE:</strong>
-      This link will expire after 7 days counting from the time of receiving it
-    </p>
-    <div>
-      <a href="{{redirect_url}}" class="btn">Yes this is my email</a>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    "
+  >
+    <div
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      "
+    >
+      <h2 style="color: #2b3513">Hello {{client_mail}},</h2>
+      <p>
+        Thank you for subscribing to the <strong>MAN Newsletter</strong>!<br />
+        Please click the button below to verify your email and complete your
+        subscription.
+      </p>
+
+      <p>
+        <strong>NOTE:</strong> This link will expire after 7 days from the time
+        you received this email.
+      </p>
+
+      <div style="margin: 30px 0; text-align: center">
+        <a
+          href="{{redirect_url}}"
+          style="
+            background-color: #2b3513;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+          "
+          >Yes, this is my email</a
+        >
+      </div>
+
+      <p style="font-size: 13px; color: #666">
+        If you did not request this subscription, please ignore this email.
+      </p>
     </div>
   </body>
 </html>

@@ -2,6 +2,8 @@ from aboutus import models
 from rest_framework import serializers
 from rest_framework import exceptions
 
+from app.serializer import CleanedImageField
+
 
 class AboutContactUsSerializer(serializers.ModelSerializer):
 
@@ -11,119 +13,46 @@ class AboutContactUsSerializer(serializers.ModelSerializer):
 
 
 class AboutHistorySerializer(serializers.ModelSerializer):
-    main_image = serializers.ImageField(required=False)
-    history_image = serializers.ImageField(required=False)
-    mission_image = serializers.ImageField(required=False)
-    vision_image = serializers.ImageField(required=False)
+    main_image = CleanedImageField(required=False)
+    history_image = CleanedImageField(required=False)
+    mission_image = CleanedImageField(required=False)
+    vision_image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutHistory
         exclude = ["writer"]
 
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in [
-            "main_image",
-            "history_image",
-            "mission_image",
-            "vision_image",
-        ]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
-
 
 class AboutAdvocacySerializer(serializers.ModelSerializer):
-    main_image = serializers.ImageField(required=False)
+    main_image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutAdvocacy
         exclude = ["writer"]
 
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in [
-            "main_image",
-        ]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
-
 
 class AboutAffilliateSerializer(serializers.ModelSerializer):
-    main_image = serializers.ImageField(required=False)
+    main_image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutAffilliate
         exclude = ["writer"]
 
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in [
-            "main_image",
-        ]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
-
 
 class AboutHowWeWorkSerializer(serializers.ModelSerializer):
-    main_image = serializers.ImageField(required=False)
+    main_image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutHowWeWork
         exclude = ["writer"]
 
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in [
-            "main_image",
-        ]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
-
 
 class AboutWhereWeOperateSerializer(serializers.ModelSerializer):
-    main_image = serializers.ImageField(required=False)
+    main_image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutWhereWeOperate
         exclude = ["writer"]
-
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in [
-            "main_image",
-        ]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
 
 
 class AboutWhereWeOperateOfficeSerializer(serializers.ModelSerializer):
@@ -151,19 +80,7 @@ class AboutWhereWeOperateBranchSerializer(serializers.ModelSerializer):
 
 
 class AboutOurExecutivesSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=False)
-
-    def to_representation(self, instance):
-        """Ensure images return full URLs in response."""
-        request = self.context.get("request")
-        representation = super().to_representation(instance)
-
-        for image_field in ["image"]:
-            image = getattr(instance, image_field)
-            if image and request:
-                representation[image_field] = request.build_absolute_uri(image.url)
-
-        return representation
+    image = CleanedImageField(required=False)
 
     class Meta:
         model = models.AboutOurExecutives
