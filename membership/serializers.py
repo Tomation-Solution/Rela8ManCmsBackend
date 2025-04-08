@@ -1,4 +1,5 @@
 from rest_framework import serializers, exceptions
+from app.serializer import CleanedImageField
 from membership.models import (
     WhyJoinMan,
     JoiningStep,
@@ -39,42 +40,20 @@ class FAQsSerializer(serializers.ModelSerializer):
 
 
 class HomePageSerializer(serializers.ModelSerializer):
-    Logo = serializers.ImageField(required=False)
-    slider_image1 = serializers.ImageField(required=False)
-    slider_image2 = serializers.ImageField(required=False)
-    slider_image3 = serializers.ImageField(required=False)
-    history_image = serializers.ImageField(required=False)
-    join_man_image = serializers.ImageField(required=False)
+    Logo = CleanedImageField(required=False)
+    slider_image1 = CleanedImageField(required=False)
+    slider_image2 = CleanedImageField(required=False)
+    slider_image3 = CleanedImageField(required=False)
+    history_image = CleanedImageField(required=False)
+    join_man_image = CleanedImageField(required=False)
 
     class Meta:
         model = HomePage
         exclude = ["writer"]
 
-    def get_image_url(self, instance, field_name):
-        request = self.context.get("request")
-        image = getattr(instance, field_name)
-        return request.build_absolute_uri(image.url) if image and request else None
-
-    def to_representation(self, instance):
-        """Override to return full URLs for image fields"""
-        data = super().to_representation(instance)
-        image_fields = [
-            "Logo",
-            "slider_image1",
-            "slider_image2",
-            "slider_image3",
-            "history_image",
-            "join_man_image",
-        ]
-
-        for field in image_fields:
-            data[field] = self.get_image_url(instance, field)
-
-        return data
-
 
 class WhyWeAreUniqueSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=False)
+    image = CleanedImageField(required=False)
 
     class Meta:
         model = WhyWeAreUnique

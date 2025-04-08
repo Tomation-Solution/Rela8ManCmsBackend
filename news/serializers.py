@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from app.serializer import CleanedImageField
 from news.models import News, UploadedImage
 
 
@@ -34,7 +35,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
 class NewsUpdateSerializer(serializers.ModelSerializer):
     details = serializers.JSONField(required=False)
-    image = serializers.ImageField(
+    image = CleanedImageField(
         required=False, allow_null=True
     )  # Allow empty image field
     title = serializers.CharField(required=False, allow_blank=True)

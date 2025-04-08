@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from app.serializer import CleanedImageField
 from reports.models import Reports
 
 
@@ -8,7 +9,7 @@ class ReportsParagraphSerializer(serializers.Serializer):
 
 
 class ReportsSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=False)
+    image = CleanedImageField(required=False)
     link = serializers.FileField(required=False)
     readmore_link = serializers.URLField(required=False, allow_blank=True)
 
