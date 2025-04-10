@@ -37,4 +37,4 @@ urlpatterns = [
     path("api/payments/", include("payments.urls")),
     path("api/agmcms/", include("agmcms.urls")),
     path("api/homepage/", include("homepage.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

@@ -1,4 +1,4 @@
-from app.serializer import CleanedImageField
+from app.serializer import CloudinaryImageField
 from services import models
 from rest_framework import serializers
 import secrets
@@ -6,7 +6,7 @@ import re
 
 
 class AllServicesSerializer(serializers.ModelSerializer):
-    image = CleanedImageField(required=False)
+    image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AllServices

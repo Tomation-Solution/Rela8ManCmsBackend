@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework import exceptions
-from app.serializer import CleanedImageField
+
+from app.serializer import CloudinaryImageField
 from publications.models import Publication, PublicationType
 
 
@@ -17,7 +18,7 @@ class PublicationSerializer(serializers.ModelSerializer):
     readmore_link = serializers.URLField(
         required=False, allow_blank=True, allow_null=True
     )
-    image = CleanedImageField(required=False, allow_null=True)
+    image = CloudinaryImageField(required=False, allow_null=True)
     link = serializers.FileField(required=False, allow_null=True)
 
     # New fields

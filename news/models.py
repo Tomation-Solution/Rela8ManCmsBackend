@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from authentication.models import User
-from cloudinary_storage.storage import RawMediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage, MediaCloudinaryStorage
 
 # Create your models here.
 
@@ -11,7 +11,11 @@ from cloudinary_storage.storage import RawMediaCloudinaryStorage
 class News(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(
-        upload_to="images/news/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/news/",
+        blank=True,
+        null=True,
+        default=None,
     )
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300, blank=True, null=True)  # Optional
@@ -31,7 +35,7 @@ class News(models.Model):
 
 
 class UploadedImage(models.Model):
-    image = models.ImageField(upload_to="uploads/")
+    image = models.ImageField(storage=MediaCloudinaryStorage(), upload_to="uploads/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

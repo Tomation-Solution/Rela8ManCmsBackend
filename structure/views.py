@@ -1,16 +1,34 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, parsers, exceptions, status
 from structure.models import SectoralGroup, MRC, MRCServices, MPDCL, MPDCLServices
-from structure.serializers import SectoralGroupSerializer, MRCSerializer, MRCServicesSerializer, MPDCLSerializer, MPDCLServicesSerializer
+from structure.serializers import (
+    SectoralGroupSerializer,
+    MRCSerializer,
+    MRCServicesSerializer,
+    MPDCLSerializer,
+    MPDCLServicesSerializer,
+)
 from utils import custom_response, custom_parsers, custom_permissions
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
+
+# paginations.py or any utils file
+
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 10  # Default items per page
+    page_size_query_param = (
+        "page_size"  # Allow the client to override using ?page_size=
+    )
+    max_page_size = 100
 
 
 class SectoralGroupView(generics.ListCreateAPIView):
     serializer_class = SectoralGroupSerializer
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.IsAuthenticated]
     parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
+    pagination_class = CustomPageNumberPagination  # Add pagination here
 
     def get_queryset(self):
         return SectoralGroup.objects.all()
@@ -20,13 +38,44 @@ class SectoralGroupView(generics.ListCreateAPIView):
 
     def list(self, request):
         queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="sectoral groups", data=serializer.data)
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return custom_response.Success_response(
+            msg="sectoral groups", data=serializer.data
+        )
+
+
+# class SectoralGroupView(generics.ListCreateAPIView):
+#     serializer_class = SectoralGroupSerializer
+#     permission_classes = [
+#         permissions.IsAuthenticated,
+#     ]
+#     parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
+
+#     def get_queryset(self):
+#         return SectoralGroup.objects.all()
+
+#     def perform_create(self, serializer):
+#         return serializer.save(writer=self.request.user)
+
+#     def list(self, request):
+#         queryset = self.get_queryset()
+#         serializer = self.serializer_class(queryset, many=True)
+#         return custom_response.Success_response(
+#             msg="sectoral groups", data=serializer.data
+#         )
 
 
 class SectoralGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SectoralGroupSerializer
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
     parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
     lookup_field = "id"
 
@@ -43,11 +92,15 @@ class MRCView(generics.GenericAPIView):
             mrc_data = MRC.objects.get(id=1)
             serializer = self.serializer_class(mrc_data)
 
-            return custom_response.Success_response(msg="mrc data", data=serializer.data)
+            return custom_response.Success_response(
+                msg="mrc data", data=serializer.data
+            )
         except MRC.DoesNotExist as exp:
             raise exceptions.NotFound
         except:
-            return custom_response.Response({"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST)
+            return custom_response.Response(
+                {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def put(self, request):
         update_data = request.data
@@ -72,7 +125,9 @@ class MRCServicesView(generics.ListCreateAPIView):
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="mrc services", data=serializer.data)
+        return custom_response.Success_response(
+            msg="mrc services", data=serializer.data
+        )
 
 
 class MRCServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -94,11 +149,15 @@ class MPDCLView(generics.GenericAPIView):
             mpdcl_data = MPDCL.objects.get(id=1)
             serializer = self.serializer_class(mpdcl_data)
 
-            return custom_response.Success_response(msg="mpdcl data", data=serializer.data)
+            return custom_response.Success_response(
+                msg="mpdcl data", data=serializer.data
+            )
         except MPDCL.DoesNotExist as exp:
             raise exceptions.NotFound
         except:
-            return custom_response.Response({"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST)
+            return custom_response.Response(
+                {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def put(self, request):
         update_data = request.data
@@ -124,7 +183,9 @@ class MPDCLServicesView(generics.ListCreateAPIView):
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="mpdcl service", data=serializer.data)
+        return custom_response.Success_response(
+            msg="mpdcl service", data=serializer.data
+        )
 
 
 class MPDCLServicesDetialView(generics.RetrieveUpdateDestroyAPIView):
@@ -135,6 +196,7 @@ class MPDCLServicesDetialView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return MPDCLServices.objects.all()
+
 
 # PUBLIC VIEWS
 
@@ -148,7 +210,9 @@ class SectoralGroupPublicView(generics.ListAPIView):
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="sectoral groups", data=serializer.data)
+        return custom_response.Success_response(
+            msg="sectoral groups", data=serializer.data
+        )
 
 
 class MRCServicePublicView(generics.ListAPIView):
@@ -172,4 +236,6 @@ class MPDCLServicesPublicView(generics.ListAPIView):
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(msg="mpdcl service", data=serializer.data)
+        return custom_response.Success_response(
+            msg="mpdcl service", data=serializer.data
+        )

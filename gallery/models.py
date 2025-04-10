@@ -1,5 +1,8 @@
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import (
+    MediaCloudinaryStorage,
+)
 
 # Create your models here.
 
@@ -21,7 +24,11 @@ class GalleryItems(models.Model):
     gallery = models.ForeignKey(to=Gallery, on_delete=models.CASCADE)
     caption = models.CharField(max_length=300)
     image = models.ImageField(
-        upload_to='images/gallery/', blank=False, null=False)
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/gallery/",
+        blank=False,
+        null=False,
+    )
 
     def __str__(self) -> str:
         return f"gallery item || {self.id}"

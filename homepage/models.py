@@ -1,10 +1,18 @@
 from django.db import models
+from cloudinary_storage.storage import (
+    MediaCloudinaryStorage,
+)
 
 
 class HomePageSlider(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
-    banner = models.ImageField(null=True, upload_to="sliderbanner/%Y/", default=None)
+    banner = models.ImageField(
+        storage=MediaCloudinaryStorage(),
+        null=True,
+        upload_to="sliderbanner/%Y/",
+        default=None,
+    )
     order_position = models.PositiveIntegerField(null=True)
     is_archived = models.BooleanField(default=False)
 

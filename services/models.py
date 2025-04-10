@@ -1,6 +1,9 @@
 from django.db import models
 from authentication.models import User
 import secrets
+from cloudinary_storage.storage import (
+    MediaCloudinaryStorage,
+)
 
 # Create your models here.
 
@@ -14,7 +17,9 @@ class AllServices(models.Model):
         ("OTHERS", "OTHERS"),
     ]
 
-    image = models.ImageField(default=None, blank=True, null=True)
+    image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
     name = models.CharField(max_length=300)
     description = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=300, choices=serviceType)
@@ -65,7 +70,11 @@ class NewsletterUIConfig(models.Model):
     description = models.TextField()
     btn_text = models.CharField(max_length=100)
     form_image = models.ImageField(
-        upload_to="images/newsletter_ui/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/newsletter_ui/",
+        blank=True,
+        null=True,
+        default=None,
     )
 
     def __str__(self):

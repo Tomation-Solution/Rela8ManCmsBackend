@@ -1,5 +1,8 @@
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import (
+    MediaCloudinaryStorage,
+)
 
 # Create your models here.
 
@@ -7,16 +10,32 @@ from authentication.models import User
 class AboutHistory(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     main_image = models.ImageField(
-        upload_to="images/about/history/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/history/",
+        blank=True,
+        null=True,
+        default=None,
     )
     history_image = models.ImageField(
-        upload_to="images/about/history/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/history/",
+        blank=True,
+        null=True,
+        default=None,
     )
     mission_image = models.ImageField(
-        upload_to="images/about/history/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/history/",
+        blank=True,
+        null=True,
+        default=None,
     )
     vision_image = models.ImageField(
-        upload_to="images/about/history/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/history/",
+        blank=True,
+        null=True,
+        default=None,
     )
     history_paragraphs = models.TextField()
     core_values = models.TextField()
@@ -38,7 +57,11 @@ class AboutHistory(models.Model):
 class AboutAdvocacy(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     main_image = models.ImageField(
-        upload_to="images/about/advocacy/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/advocacy/",
+        blank=True,
+        null=True,
+        default=None,
     )
     main_achievements = models.TextField()
 
@@ -55,7 +78,11 @@ class AboutAdvocacy(models.Model):
 class AboutAffilliate(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     main_image = models.ImageField(
-        upload_to="images/about/affilliate/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/affilliate/",
+        blank=True,
+        null=True,
+        default=None,
     )
 
     ops = models.TextField()
@@ -74,7 +101,11 @@ class AboutAffilliate(models.Model):
 class AboutHowWeWork(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     main_image = models.ImageField(
-        upload_to="images/about/how-we-work/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/how-we-work/",
+        blank=True,
+        null=True,
+        default=None,
     )
 
     how_we_work = models.TextField()
@@ -100,7 +131,11 @@ class AboutHowWeWork(models.Model):
 class AboutWhereWeOperate(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     main_image = models.ImageField(
-        upload_to="images/about/where-we-operate/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/about/where-we-operate/",
+        blank=True,
+        null=True,
+        default=None,
     )
     national_secretariat = models.TextField()
     coorprate_office = models.TextField()
@@ -164,7 +199,9 @@ class AboutOurExecutives(models.Model):
     ]
 
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
-    image = models.ImageField(default=None, blank=True, null=True)
+    image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300, unique=True)
     extra_title1 = models.CharField(max_length=300, blank=True, null=True)

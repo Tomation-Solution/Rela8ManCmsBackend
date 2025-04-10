@@ -1,5 +1,6 @@
 from rest_framework import serializers, exceptions
-from app.serializer import CleanedImageField
+
+from app.serializer import CloudinaryImageField
 from membership.models import (
     WhyJoinMan,
     JoiningStep,
@@ -40,12 +41,12 @@ class FAQsSerializer(serializers.ModelSerializer):
 
 
 class HomePageSerializer(serializers.ModelSerializer):
-    Logo = CleanedImageField(required=False)
-    slider_image1 = CleanedImageField(required=False)
-    slider_image2 = CleanedImageField(required=False)
-    slider_image3 = CleanedImageField(required=False)
-    history_image = CleanedImageField(required=False)
-    join_man_image = CleanedImageField(required=False)
+    Logo = CloudinaryImageField(required=False)
+    slider_image1 = CloudinaryImageField(required=False)
+    slider_image2 = CloudinaryImageField(required=False)
+    slider_image3 = CloudinaryImageField(required=False)
+    history_image = CloudinaryImageField(required=False)
+    join_man_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = HomePage
@@ -53,7 +54,7 @@ class HomePageSerializer(serializers.ModelSerializer):
 
 
 class WhyWeAreUniqueSerializer(serializers.ModelSerializer):
-    image = CleanedImageField(required=False)
+    image = CloudinaryImageField(required=False)
 
     class Meta:
         model = WhyWeAreUnique

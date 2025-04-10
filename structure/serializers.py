@@ -1,10 +1,10 @@
-from app.serializer import CleanedImageField
+from app.serializer import CloudinaryImageField
 from structure.models import SectoralGroup, MRC, MRCServices, MPDCL, MPDCLServices
 from rest_framework import serializers
 
 
 class SectoralGroupSerializer(serializers.ModelSerializer):
-    image = CleanedImageField(required=False)
+    image = CloudinaryImageField(required=False)
 
     class Meta:
         model = SectoralGroup

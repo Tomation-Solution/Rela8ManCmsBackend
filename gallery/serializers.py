@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from app.serializer import CleanedImageField
+
+from app.serializer import CloudinaryImageField
 from gallery.models import Gallery, GalleryItems
 from drf_extra_fields.fields import Base64ImageField
 
@@ -56,7 +57,7 @@ class GalleryRenameSerializer(serializers.Serializer):
 
 class GalleryItemSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(required=True)
-    image = CleanedImageField(required=True)
+    image = CloudinaryImageField(required=True)
     gallery = serializers.PrimaryKeyRelatedField(
         queryset=Gallery.objects.all(), allow_null=False, required=False
     )

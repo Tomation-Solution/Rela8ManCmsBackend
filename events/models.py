@@ -1,12 +1,20 @@
 from django.db import models
 from authentication.models import User
+from cloudinary_storage.storage import (
+    MediaCloudinaryStorage,
+)
+
 # Create your models here.
 
 
 class Event(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(
-        upload_to='images/events/', blank=True, null=True)
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/events/",
+        blank=True,
+        null=True,
+    )
     name = models.CharField(max_length=300)
     # WHETHER IT IS AN ANNUAL GENERAL MEETING EVENT OR NOT
     is_agm = models.BooleanField(default=False)

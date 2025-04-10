@@ -1,6 +1,6 @@
 from django.db import models
 from authentication.models import User
-from cloudinary_storage.storage import RawMediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage, MediaCloudinaryStorage
 
 # Create your models here.
 
@@ -16,7 +16,11 @@ class PublicationType(models.Model):
 class Publication(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(
-        upload_to="images/publications/", blank=True, null=True, default=None
+        storage=MediaCloudinaryStorage(),
+        upload_to="images/publications/",
+        blank=True,
+        null=True,
+        default=None,
     )
     name = models.CharField(max_length=300)
     title = models.CharField(max_length=300, blank=True, null=True)

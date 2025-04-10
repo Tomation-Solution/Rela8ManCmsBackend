@@ -2,7 +2,7 @@ from aboutus import models
 from rest_framework import serializers
 from rest_framework import exceptions
 
-from app.serializer import CleanedImageField
+from app.serializer import CloudinaryImageField
 
 
 class AboutContactUsSerializer(serializers.ModelSerializer):
@@ -13,10 +13,10 @@ class AboutContactUsSerializer(serializers.ModelSerializer):
 
 
 class AboutHistorySerializer(serializers.ModelSerializer):
-    main_image = CleanedImageField(required=False)
-    history_image = CleanedImageField(required=False)
-    mission_image = CleanedImageField(required=False)
-    vision_image = CleanedImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
+    history_image = CloudinaryImageField(required=False)
+    mission_image = CloudinaryImageField(required=False)
+    vision_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutHistory
@@ -24,7 +24,7 @@ class AboutHistorySerializer(serializers.ModelSerializer):
 
 
 class AboutAdvocacySerializer(serializers.ModelSerializer):
-    main_image = CleanedImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutAdvocacy
@@ -32,7 +32,7 @@ class AboutAdvocacySerializer(serializers.ModelSerializer):
 
 
 class AboutAffilliateSerializer(serializers.ModelSerializer):
-    main_image = CleanedImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutAffilliate
@@ -40,7 +40,7 @@ class AboutAffilliateSerializer(serializers.ModelSerializer):
 
 
 class AboutHowWeWorkSerializer(serializers.ModelSerializer):
-    main_image = CleanedImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutHowWeWork
@@ -48,7 +48,7 @@ class AboutHowWeWorkSerializer(serializers.ModelSerializer):
 
 
 class AboutWhereWeOperateSerializer(serializers.ModelSerializer):
-    main_image = CleanedImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutWhereWeOperate
@@ -80,7 +80,7 @@ class AboutWhereWeOperateBranchSerializer(serializers.ModelSerializer):
 
 
 class AboutOurExecutivesSerializer(serializers.ModelSerializer):
-    image = CleanedImageField(required=False)
+    image = CloudinaryImageField(required=False)
 
     class Meta:
         model = models.AboutOurExecutives
