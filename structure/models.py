@@ -32,13 +32,13 @@ class MRCServices(models.Model):
 
 class MPDCL(models.Model):
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
-    who_we_are = models.JSONField()
+    who_we_are = models.TextField()
     our_objectives_header = models.TextField()
-    our_objectives_items = models.JSONField()  # array
+    our_objectives_items = models.TextField()
     renewable_image = models.ImageField(
         storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
     )
-    renewable_desc = models.JSONField()
+    renewable_desc = models.TextField()
     renewable_items = models.JSONField()  # array{header, description}
 
 
