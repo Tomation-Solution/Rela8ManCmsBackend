@@ -2,6 +2,9 @@ from rest_framework import serializers, exceptions
 
 from app.serializer import CloudinaryImageField
 from membership.models import (
+    JoinStepBanner,
+    OurMembersBanner,
+    WhyJoinBanner,
     WhyJoinMan,
     JoiningStep,
     FAQs,
@@ -10,6 +13,30 @@ from membership.models import (
     OurMembers,
     Advertisement,
 )
+
+
+class OurMembersBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = OurMembersBanner
+        fields = ["id", "banner_image"]
+
+
+class JoinStepBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = JoinStepBanner
+        fields = ["id", "banner_image"]
+
+
+class WhyJoinBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = WhyJoinBanner
+        fields = ["id", "banner_image"]
 
 
 class WhyJoinManSerializers(serializers.ModelSerializer):

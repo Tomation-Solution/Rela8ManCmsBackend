@@ -4,7 +4,15 @@ from cloudinary_storage.storage import (
     MediaCloudinaryStorage,
 )
 
+
 # Create your models here.
+class TrainingBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return f"Training banner {self.id}"
 
 
 class Training(models.Model):

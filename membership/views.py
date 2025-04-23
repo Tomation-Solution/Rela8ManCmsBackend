@@ -1,6 +1,9 @@
 from rest_framework import generics, permissions, exceptions, status, parsers
 from membership import serializers
 from membership.models import (
+    JoinStepBanner,
+    OurMembersBanner,
+    WhyJoinBanner,
     WhyJoinMan,
     JoiningStep,
     FAQs,
@@ -18,6 +21,132 @@ from rest_framework import status, permissions
 from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
+
+
+class PublicOurMembersBannerView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            banner = OurMembersBanner.objects.first()
+            if not banner:
+                return Response(
+                    {"detail": "No banner found."}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            serializer = serializers.OurMembersBannerSerializer(banner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProtectedOurMembersBannerUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            banner = OurMembersBanner.objects.first()
+            if not banner:
+                banner = OurMembersBanner.objects.create()
+
+            serializer = serializers.OurMembersBannerSerializer(
+                banner, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublicJoinStepBannerView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            banner = JoinStepBanner.objects.first()
+            if not banner:
+                return Response(
+                    {"detail": "No banner found."}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            serializer = serializers.JoinStepBannerSerializer(banner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProtectedJoinStepBannerUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            banner = JoinStepBanner.objects.first()
+            if not banner:
+                banner = JoinStepBanner.objects.create()
+
+            serializer = serializers.JoinStepBannerSerializer(
+                banner, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublicWhyJoinBannerView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            banner = WhyJoinBanner.objects.first()
+            if not banner:
+                return Response(
+                    {"detail": "No banner found."}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            serializer = serializers.WhyJoinBannerSerializer(banner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProtectedWhyJoinBannerUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            banner = WhyJoinBanner.objects.first()
+            if not banner:
+                banner = WhyJoinBanner.objects.create()
+
+            serializer = serializers.WhyJoinBannerSerializer(
+                banner, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WhyJoinManView(generics.ListCreateAPIView):

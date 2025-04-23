@@ -4,7 +4,33 @@ from cloudinary_storage.storage import (
     MediaCloudinaryStorage,
 )
 
+
 # Create your models here.
+class OurMembersBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return f"our members banner {self.id}"
+
+
+class JoinStepBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return f"join step banner {self.id}"
+
+
+class WhyJoinBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return f"Why join banner {self.id}"
 
 
 class WhyJoinMan(models.Model):

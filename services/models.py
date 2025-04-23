@@ -8,6 +8,18 @@ from cloudinary_storage.storage import (
 # Create your models here.
 
 
+class ServiceBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+    mrc_desc = models.TextField()
+    mpdcl_desc = models.TextField()
+    core_desc = models.TextField()
+
+    def __str__(self) -> str:
+        return f"Service banner {self.id}"
+
+
 class AllServices(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     serviceType = [

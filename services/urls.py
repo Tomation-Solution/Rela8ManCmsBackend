@@ -2,7 +2,22 @@ from django.urls import path
 from services import views
 
 urlpatterns = [
+    path(
+        "service-banner/",
+        views.PublicServiceBannerView.as_view(),
+        name="get-service-banner",
+    ),
+    path(
+        "service-banner/update/",
+        views.ProtectedServiceBannerUpdateView.as_view(),
+        name="update-service-banner",
+    ),
     path("request-service", views.RequestServiceView.as_view(), name="request-service"),
+    path(
+        "request-services/download",
+        views.download_request_services,
+        name="download-request-services",
+    ),
     path(
         "verify-request",
         views.VerifyServiceRequestEmailView.as_view(),

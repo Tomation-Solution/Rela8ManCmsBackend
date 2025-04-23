@@ -33,6 +33,9 @@ class News(models.Model):
     def __str__(self) -> str:
         return f"{self.id} || {str(self.writer)}"
 
+    class Meta:
+        ordering = ["-created_at"]
+
 
 class UploadedImage(models.Model):
     image = models.ImageField(storage=MediaCloudinaryStorage(), upload_to="uploads/")

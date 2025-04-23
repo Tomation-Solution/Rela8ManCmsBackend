@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* Page setup for landscape and A3 size */
+      @page {
+        size: A3 landscape;
+        margin: 20mm;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 12px 15px;
+        font-size: 12px;
+        text-align: left;
+        word-wrap: break-word; /* Allow long words to wrap */
+        max-width: 150px; /* Add max-width to prevent too wide columns */
+        overflow: hidden;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      td {
+        word-wrap: break-word; /* Ensure long text wraps properly */
+        white-space: normal; /* Allow text to wrap within cells */
+      }
+
+      /* Zebra striping for table rows */
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Responsive table */
+      @media screen and (max-width: 600px) {
+        th,
+        td {
+          font-size: 10px;
+        }
+
+        table {
+          font-size: 12px;
+          margin-top: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>{{ title }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Ref</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Company</th>
+          <th>Message</th>
+          <th>Verified</th>
+          <th>Created</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr>
+          <td>{{ req.ref }}</td>
+          <td>{{ req.name }}</td>
+          <td>{{ req.email }}</td>
+          <td>{{ req.company_name }}</td>
+          <td>{{ req.message }}</td>
+          <td>{{ req.is_verified }}</td>
+          <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ req.updated_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

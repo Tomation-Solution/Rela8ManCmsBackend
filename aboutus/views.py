@@ -12,30 +12,146 @@ from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+import csv
+
+from utils.html2pdf import render_to_pdf
+
+
+class AboutContactUsDownloadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        format = request.data.get("format", "csv").lower()
+        start_date = request.data.get("start_date")
+        end_date = request.data.get("end_date")
+
+        queryset = models.AboutContactUs.objects.all()
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+
+        if format == "pdf":
+            return self._download_pdf(queryset)
+        return self._download_csv(queryset)
+
+    def _download_csv(self, queryset):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="about_contact_us.csv"'
+
+        writer = csv.writer(response)
+        headers = [
+            "id",
+            "name",
+            "phone_no",
+            "email",
+            "subject",
+            "message",
+            "created_at",
+            "updated_at",
+        ]
+        writer.writerow(headers)
+
+        for contact in queryset:
+            writer.writerow(
+                [
+                    contact.id,
+                    contact.name,
+                    contact.phone_no,
+                    contact.email,
+                    contact.subject,
+                    contact.message,
+                    contact.created_at,
+                    contact.updated_at,
+                ]
+            )
+        return response
+
+    def _download_pdf(self, queryset):
+        data = []
+        for contact in queryset:
+            data.append(
+                {
+                    "name": contact.name,
+                    "phone_no": contact.phone_no,
+                    "email": contact.email,
+                    "subject": contact.subject,
+                    "message": contact.message,
+                    "created_at": contact.created_at,
+                    "updated_at": contact.updated_at,
+                }
+            )
+
+        context = {
+            "title": "Contact Us Messages",
+            "contacts": data,
+        }
+
+        pdf = render_to_pdf("about_contact_us_pdf.html", context)
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = "attachment; filename=about_contact_us.pdf"
+        return response
+
+
+class CustomPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class AboutContactUsView(generics.GenericAPIView):
     serializer_class = serializers.AboutContactUsSerializer
     permission_classes = (custom_permissions.IsPostRequestOrAuthenticated,)
+    pagination_class = CustomPagination
 
     def get_queryset(self):
-        return models.AboutContactUs.objects.all()
+        return models.AboutContactUs.objects.all().order_by("-created_at")
 
     def get(self, request, id=None):
         contacts = self.get_queryset()
-        serializer = self.serializer_class(contacts, many=True)
-        return custom_response.Success_response(msg="contacts", data=serializer.data)
+        paginator = self.pagination_class()
+        paginated_qs = paginator.paginate_queryset(contacts, request)
+        serializer = self.serializer_class(paginated_qs, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
-        contact_data = request.data
-        serializer = self.serializer_class(data=contact_data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
-        contact_data = serializer.data
         return custom_response.Success_response(
             msg="contact message sent",
             status_code=status.HTTP_201_CREATED,
-            data=contact_data,
+            data=serializer.data,
         )
+
+
+# class AboutContactUsView(generics.GenericAPIView):
+#     serializer_class = serializers.AboutContactUsSerializer
+#     permission_classes = (custom_permissions.IsPostRequestOrAuthenticated,)
+
+#     def get_queryset(self):
+#         return models.AboutContactUs.objects.all()
+
+#     def get(self, request, id=None):
+#         contacts = self.get_queryset()
+#         serializer = self.serializer_class(contacts, many=True)
+#         return custom_response.Success_response(msg="contacts", data=serializer.data)
+
+#     def post(self, request):
+#         contact_data = request.data
+#         serializer = self.serializer_class(data=contact_data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+
+#         contact_data = serializer.data
+#         return custom_response.Success_response(
+#             msg="contact message sent",
+#             status_code=status.HTTP_201_CREATED,
+#             data=contact_data,
+#         )
 
 
 class AboutContactUsDetailsView(generics.GenericAPIView):

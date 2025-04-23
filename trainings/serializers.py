@@ -1,5 +1,14 @@
 from rest_framework import serializers, exceptions
-from trainings.models import Training
+from app.serializer import CloudinaryImageField
+from trainings.models import Training, TrainingBanner
+
+
+class TrainingBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = TrainingBanner
+        fields = ["id", "banner_image"]
 
 
 class TrainingsSerializer(serializers.ModelSerializer):
@@ -11,16 +20,18 @@ class TrainingsSerializer(serializers.ModelSerializer):
         if is_paid == True:
             if not price:
                 raise exceptions.ValidationError(
-                    "price must be provided on paid trainings.")
+                    "price must be provided on paid trainings."
+                )
         elif is_paid == False:
             if price:
                 raise exceptions.ValidationError(
-                    "price must not be provided on free trainings.")
+                    "price must not be provided on free trainings."
+                )
 
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
-        is_paid = validated_data.get('is_paid', instance.is_paid)
+        is_paid = validated_data.get("is_paid", instance.is_paid)
 
         if is_paid == False:
             instance.price = 0.00

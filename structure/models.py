@@ -15,7 +15,30 @@ class SectoralGroup(models.Model):
     )
 
 
+class MrcContactPage(models.Model):
+    get_in_touch_header = models.CharField(max_length=255)
+    get_in_touch_desc = models.TextField()
+    address_header = models.CharField(max_length=255)
+    address = models.TextField()
+    phone = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    link_text = models.CharField(max_length=255)
+    business_hours_header = models.CharField(max_length=255)
+    business_hours = models.TextField()
+
+    def __str__(self):
+        return "MRC Contact Page"
+
+    class Meta:
+        # Ensure only one record exists in the database.
+        verbose_name = "MRC Contact Page"
+        verbose_name_plural = "MRC Contact Pages"
+
+
 class MRC(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     who_we_are = models.TextField()
     objectives = models.TextField()
@@ -31,6 +54,9 @@ class MRCServices(models.Model):
 
 
 class MPDCL(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
     writer = models.OneToOneField(to=User, on_delete=models.SET_NULL, null=True)
     who_we_are = models.TextField()
     our_objectives_header = models.TextField()

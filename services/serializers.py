@@ -13,6 +13,14 @@ class AllServicesSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ServiceBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = models.ServiceBanner
+        fields = "__all__"
+
+
 class RequestServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -55,7 +63,7 @@ class SubscribeToNewsLetterSerializer(serializers.ModelSerializer):
         return models.SubscribeToNewsLetter.objects.create(**validated_data)
 
 
-from .models import NewsletterUIConfig
+from .models import NewsletterUIConfig, ServiceBanner
 
 
 class NewsletterUIConfigSerializer(serializers.ModelSerializer):

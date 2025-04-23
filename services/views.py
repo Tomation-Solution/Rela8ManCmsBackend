@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework import generics, permissions, status, filters
 from services.serializers import (
     AllServicesSerializer,
@@ -5,6 +6,7 @@ from services.serializers import (
     SubscribeToNewsLetterSerializer,
 )
 from services.models import RequestService, SubscribeToNewsLetter, AllServices
+from utils.html2pdf import render_to_pdf
 from utils.tokens_handler import generate_token, decode_token
 from django.contrib.sites.shortcuts import get_current_site
 from utils import mailer, custom_response, custom_permissions, custom_parsers
@@ -19,24 +21,255 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import HttpResponse
+
+import csv
+from io import StringIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from rest_framework.pagination import PageNumberPagination
+from datetime import datetime
+from rest_framework.decorators import api_view, permission_classes
+
+from services import serializers
 
 # Create your views here.
+
+
+class PublicServiceBannerView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            banner = ServiceBanner.objects.first()
+            if not banner:
+                return Response(
+                    {"detail": "No banner found."}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            serializer = serializers.ServiceBannerSerializer(banner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProtectedServiceBannerUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            banner = ServiceBanner.objects.first()
+            if not banner:
+                banner = ServiceBanner.objects.create()
+
+            serializer = serializers.ServiceBannerSerializer(
+                banner, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@permission_classes(
+    [permissions.IsAuthenticated]
+)  # or replace with your custom permission
+def download_request_services(request):
+    download_format = request.data.get("format", "").lower()
+    queryset = RequestService.objects.all()
+
+    print(download_format)
+    print(queryset)
+
+    # Apply optional filters (similar to your class-based view)
+    is_verified = request.data.get("is_verified")
+    if is_verified is not None:
+        queryset = queryset.filter(is_verified=is_verified.lower() == "true")
+
+    company_name = request.data.get("company_name")
+    if company_name:
+        queryset = queryset.filter(company_name__icontains=company_name)
+
+    ref = request.data.get("ref")
+    if ref:
+        queryset = queryset.filter(ref__icontains=ref)
+
+    if download_format == "csv":
+        return _download_csv(queryset)
+    elif download_format == "pdf":
+        return _download_pdf(queryset)
+    else:
+        return Response({"error": "Invalid format"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _download_csv(queryset):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename=request_services.csv"
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Ref",
+            "Name",
+            "Email",
+            "Company Name",
+            "Message",
+            "Is Verified",
+            "Created At",
+            "Updated At",
+        ]
+    )
+
+    for request in queryset:
+        writer.writerow(
+            [
+                request.ref,
+                request.name,
+                request.email,
+                request.company_name,
+                request.message,
+                request.is_verified,
+                request.created_at,
+                request.updated_at,
+            ]
+        )
+
+    return response
+
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+
+def _download_pdf(queryset):
+    # Prepare data for template
+    data = []
+    for request in queryset:
+        data.append(
+            {
+                "ref": request.ref,
+                "name": request.name,
+                "email": request.email,
+                "company_name": request.company_name,
+                "message": request.message,
+                "is_verified": request.is_verified,
+                "created_at": request.created_at,
+                "updated_at": request.updated_at,
+            }
+        )
+
+    context = {
+        "title": "Request Services Report",
+        "requests": data,
+    }
+
+    # Render to PDF
+    pdf = render_to_pdf("request_services_pdf.html", context)
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = "attachment; filename=request_services.pdf"
+    return response
+
+
+class CustomRequestServicePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class RequestServiceView(generics.GenericAPIView):
     serializer_class = RequestServiceSerializer
     permission_classes = [custom_permissions.IsPostRequestOrAuthenticated]
+    pagination_class = CustomRequestServicePagination
 
     def get_queryset(self):
-        return RequestService.objects.filter(is_verified=True)
+        print("=== START: get_queryset ===")
+
+        queryset = RequestService.objects.all()
+        print(f"[DEBUG] Initial queryset count: {queryset.count()}")
+
+        # Filter by is_verified
+        is_verified = self.request.query_params.get("is_verified")
+        if is_verified is not None:
+            is_verified_bool = is_verified.lower() == "true"
+            queryset = queryset.filter(is_verified=is_verified_bool)
+            print(
+                f"[DEBUG] Applied is_verified={is_verified_bool} filter, count: {queryset.count()}"
+            )
+
+        # Filter by company_name
+        company_name = self.request.query_params.get("company_name")
+        if company_name:
+            queryset = queryset.filter(company_name__icontains=company_name)
+            print(
+                f"[DEBUG] Applied company_name={company_name} filter, count: {queryset.count()}"
+            )
+
+        # Filter by ref
+        ref = self.request.query_params.get("ref")
+        if ref:
+            queryset = queryset.filter(ref__icontains=ref)
+            print(f"[DEBUG] Applied ref={ref} filter, count: {queryset.count()}")
+
+        print(f"[DEBUG] Final queryset count: {queryset.count()}")
+        print("=== END: get_queryset ===")
+        return queryset
 
     def get(self, request):
-        all_requests = self.get_queryset()
-        serializer = self.serializer_class(all_requests, many=True)
+        try:
+            print("=== START: GET service requests ===")
 
-        return custom_response.Success_response(
-            msg="all service request", data=serializer.data
-        )
+            # Step 2: Get filtered and paginated queryset
+            queryset = self.get_queryset()
+            print(f"[INFO] Queryset count: {queryset.count()}")
+
+            page = self.paginate_queryset(queryset)
+            print(f"[INFO] Page object: {page}")
+
+            # Step 4: Return paginated response if pagination was successful
+            if page is not None:
+                print("[INFO] Returning paginated response...")
+                serializer = self.serializer_class(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            # Step 5: Return normal serialized data
+            print("[INFO] Returning full queryset (no pagination or download)...")
+            serializer = self.serializer_class(queryset, many=True)
+            return custom_response.Success_response(
+                msg="All service requests", data=serializer.data
+            )
+
+        except ValidationError as e:
+            print(f"[VALIDATION ERROR] {str(e)}")
+            return custom_response.Error_response(
+                msg="Validation error occurred", details=str(e)
+            )
+
+        except Exception as e:
+            print(f"[UNEXPECTED ERROR] {str(e)}")
+            return custom_response.Error_response(
+                msg="An unexpected error occurred", details=str(e)
+            )
+
+    # def get_queryset(self):
+    #     return RequestService.objects.filter(is_verified=True)
+
+    # def get(self, request):
+    #     all_requests = self.get_queryset()
+    #     serializer = self.serializer_class(all_requests, many=True)
+
+    #     return custom_response.Success_response(
+    #         msg="all service request", data=serializer.data
+    # )
 
     def post(self, request):
         request_data = request.data
@@ -328,7 +561,7 @@ class VerifyNewsletterSubscriptionView(APIView):
         return custom_response.Success_response("Email successfully verified")
 
 
-from .models import NewsletterUIConfig
+from .models import NewsletterUIConfig, ServiceBanner
 from .serializers import NewsletterUIConfigSerializer
 
 

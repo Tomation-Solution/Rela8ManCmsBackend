@@ -1,10 +1,56 @@
 from rest_framework import serializers, exceptions
-from events.models import Event
+from app.serializer import CloudinaryImageField
+from events.models import Event, EventAndMediaContent, EventBanner
+
+
+class EventBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = EventBanner
+        fields = ["id", "banner_image"]
+
+
+class EventAndMediaContentSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+    main_image = CloudinaryImageField(required=False)
+    news_image = CloudinaryImageField(required=False)
+    publication_image = CloudinaryImageField(required=False)
+    event_image = CloudinaryImageField(required=False)
+    report_image = CloudinaryImageField(required=False)
+    gallery_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = EventAndMediaContent
+        fields = [
+            "id",
+            "banner_image",
+            "main_image",
+            "news_image",
+            "news_title",
+            "news_description",
+            "news_link_text",
+            "publication_image",
+            "publication_title",
+            "publication_description",
+            "publication_link_text",
+            "event_image",
+            "event_title",
+            "event_description",
+            "event_link_text",
+            "report_image",
+            "report_title",
+            "report_description",
+            "report_link_text",
+            "gallery_image",
+            "gallery_title",
+            "gallery_description",
+            "gallery_link_text",
+        ]
 
 
 class EventsSerializer(serializers.ModelSerializer):
-    price = serializers.DecimalField(
-        max_digits=20, decimal_places=2, required=False)
+    price = serializers.DecimalField(max_digits=20, decimal_places=2, required=False)
 
     def validate(self, attrs):
         is_paid = attrs.get("is_paid", "")
@@ -14,23 +60,26 @@ class EventsSerializer(serializers.ModelSerializer):
         if is_paid == True:
             if not price:
                 raise exceptions.ValidationError(
-                    "price must be provided on paid events.")
+                    "price must be provided on paid events."
+                )
         elif is_paid == False:
             if price:
                 raise exceptions.ValidationError(
-                    "price must not be provided on free events.")
+                    "price must not be provided on free events."
+                )
         if is_agm == True:
             if Event.objects.filter(is_agm=True).exists():
                 raise exceptions.ValidationError("only on agm event can exist")
 
             if price:
                 raise exceptions.ValidationError(
-                    "you cant provide a price for agm events.")
+                    "you cant provide a price for agm events."
+                )
 
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
-        is_paid = validated_data.get('is_paid', instance.is_paid)
+        is_paid = validated_data.get("is_paid", instance.is_paid)
         is_agm = validated_data.get("is_agm", instance.is_agm)
 
         if is_paid == False:

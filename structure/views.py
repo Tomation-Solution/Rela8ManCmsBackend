@@ -11,9 +11,55 @@ from structure.serializers import (
 from utils import custom_response, custom_parsers, custom_permissions
 from rest_framework.pagination import PageNumberPagination
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+from .models import MrcContactPage
+from .serializers import MrcContactPageSerializer
+
 # Create your views here.
 
 # paginations.py or any utils file
+
+
+class MrcContactPageView(APIView):
+    """
+    View for getting and updating the MRC Contact Page.
+    GET is public; PATCH requires authentication.
+    """
+
+    def get_permissions(self):
+        if self.request.method == "PATCH":
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get(self, request):
+        """
+        Public GET request to retrieve the MRC Contact Page.
+        """
+        mrc_contact_page = MrcContactPage.objects.first()
+        if mrc_contact_page:
+            serializer = MrcContactPageSerializer(mrc_contact_page)
+            return Response(serializer.data)
+        return Response(
+            {"message": "MRC Contact Page not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    def patch(self, request):
+        """
+        Protected PATCH request to update or create the MRC Contact Page.
+        """
+        mrc_contact_page, _ = MrcContactPage.objects.get_or_create(id=1)
+        serializer = MrcContactPageSerializer(
+            mrc_contact_page, data=request.data, partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -86,6 +132,7 @@ class SectoralGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
 class MRCView(generics.GenericAPIView):
     serializer_class = MRCSerializer
     permission_classes = [custom_permissions.IsGetRequestOrAuthenticated]
+    parser_classes = [custom_parsers.NestedMultipartParser, parsers.FormParser]
 
     def get(self, request):
         try:
@@ -102,14 +149,25 @@ class MRCView(generics.GenericAPIView):
                 {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    def put(self, request):
-        update_data = request.data
-        mrc_data = MRC.objects.get(id=1)
-        serializer = self.serializer_class(mrc_data, data=update_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+    def patch(self, request):
+        try:
+            update_data = request.data
+            print(update_data)
+            mrc_data = MRC.objects.get(id=1)
+            serializer = self.serializer_class(
+                mrc_data, data=update_data, partial=True
+            )  # 👈 partial=True
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-        return custom_response.Success_response(msg="mrc data", data=serializer.data)
+            return custom_response.Success_response(
+                msg="mrc data", data=serializer.data
+            )
+        except Exception as e:
+            print(e)
+            return custom_response.Response(
+                {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class MRCServicesView(generics.ListCreateAPIView):
@@ -154,19 +212,31 @@ class MPDCLView(generics.GenericAPIView):
             )
         except MPDCL.DoesNotExist as exp:
             raise exceptions.NotFound
-        except:
+        except Exception as e:
+            print(e)
             return custom_response.Response(
                 {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    def put(self, request):
-        update_data = request.data
-        mpdcl_data = MPDCL.objects.get(id=1)
-        serializer = self.serializer_class(mpdcl_data, data=update_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+    def patch(self, request):
+        try:
+            update_data = request.data
+            print(update_data)
+            mpdcl_data = MPDCL.objects.get(id=1)
+            serializer = self.serializer_class(
+                mpdcl_data, data=update_data, partial=True
+            )  # 👈 partial=True
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-        return custom_response.Success_response(msg="mpdcl data", data=serializer.data)
+            return custom_response.Success_response(
+                msg="mpdcl data", data=serializer.data
+            )
+        except Exception as e:
+            print(e)
+            return custom_response.Response(
+                {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class MPDCLServicesView(generics.ListCreateAPIView):

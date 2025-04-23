@@ -108,15 +108,28 @@ class AboutHowWeWork(models.Model):
         default=None,
     )
 
-    how_we_work = models.TextField()
-    how_we_work_details = models.TextField()
-    committees = models.TextField()
-    committee_details = models.TextField()
-    adhoc = models.TextField()
-    spvehicles = models.TextField()
-    spgroups = models.TextField()
-    conduct = models.TextField()
-    conduct_listing = models.TextField()
+    how_we_work_header = models.TextField(blank=True, null=True)
+    how_we_work = models.TextField(blank=True, null=True)
+    how_we_work_details = models.TextField(blank=True, null=True)
+
+    committees_header = models.TextField(blank=True, null=True)
+    committees = models.TextField(blank=True, null=True)
+    committee_details = models.TextField(blank=True, null=True)
+
+    adhoc_header = models.TextField(blank=True, null=True)
+    adhoc = models.TextField(blank=True, null=True)
+
+    spvehicles_header = models.TextField(blank=True, null=True)
+    spvehicles = models.TextField(blank=True, null=True)
+
+    spgroups_header = models.TextField(blank=True, null=True)
+    spgroups = models.TextField(blank=True, null=True)
+
+    conduct_header = models.TextField(blank=True, null=True)
+    conduct = models.TextField(blank=True, null=True)
+
+    conduct_listing_header = models.TextField(blank=True, null=True)
+    conduct_listing = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -137,8 +150,11 @@ class AboutWhereWeOperate(models.Model):
         null=True,
         default=None,
     )
+    national_secretariat_header = models.TextField(blank=True, null=True)
     national_secretariat = models.TextField()
+    coorprate_office_header = models.TextField(blank=True, null=True)
     coorprate_office = models.TextField()
+    branch_text_header = models.TextField(blank=True, null=True)
     branch_text = models.TextField()
 
     def __str__(self) -> str:
