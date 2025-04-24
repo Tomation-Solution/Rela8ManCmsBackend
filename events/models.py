@@ -26,6 +26,7 @@ class Event(models.Model):
     name = models.CharField(max_length=300)
     # WHETHER IT IS AN ANNUAL GENERAL MEETING EVENT OR NOT
     is_agm = models.BooleanField(default=False)
+    is_current_agm = models.BooleanField(default=False)
     # THE GROUP OR SECTION THE EVENT IS FOR
     group_type = models.CharField(max_length=300)
     location = models.TextField()

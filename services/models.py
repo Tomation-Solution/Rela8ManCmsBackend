@@ -50,6 +50,8 @@ class RequestService(models.Model):
     name = models.CharField(max_length=300)
     email = models.EmailField()
     company_name = models.CharField(max_length=300)
+    type = models.TextField(null=True, blank=True)
+    service = models.TextField(null=True, blank=True)
     message = models.TextField()
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

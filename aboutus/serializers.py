@@ -3,6 +3,14 @@ from rest_framework import serializers
 from rest_framework import exceptions
 
 from app.serializer import CloudinaryImageField
+from rest_framework import serializers
+from .models import EmailOTP
+
+
+class EmailOTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailOTP
+        fields = ["email", "message_id", "token"]
 
 
 class AboutContactUsSerializer(serializers.ModelSerializer):

@@ -185,9 +185,16 @@ class AboutWhereWeOperateBranch(models.Model):
         return f"about branch {self.id}"
 
 
+import uuid
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+
+
 class AboutContactUs(models.Model):
     name = models.CharField(max_length=300)
     phone_no = models.CharField(max_length=20)
+    verified = models.BooleanField(default=False)
     email = models.EmailField()
     subject = models.TextField()
     message = models.TextField()
@@ -200,6 +207,27 @@ class AboutContactUs(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class EmailOTP(models.Model):
+    email = models.EmailField()
+    message_id = models.ForeignKey(
+        AboutContactUs,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="otp_entries",  # This is the related name for reverse lookup
+    )
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(
+            minutes=15
+        )  # 15 mins expiry
+
+    def __str__(self):
+        return f"OTP for {self.email}"
 
 
 class AboutOurExecutives(models.Model):

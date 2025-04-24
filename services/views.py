@@ -274,7 +274,9 @@ class RequestServiceView(generics.GenericAPIView):
     def post(self, request):
         request_data = request.data
         serializer = self.serializer_class(data=request_data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            print(serializer.errors)
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         request_serialized = serializer.data
@@ -315,6 +317,7 @@ class RequestServiceView(generics.GenericAPIView):
         # my send mail utility class
         mailer.sib_send_mail(
             to=[{"email": request_obj["email"], "name": request_obj["email"]}],
+            cc=[{"email": "support@manufacturersnigeria.org"}],
             html_content=html_message,
             subject=email_subject,
         )
@@ -338,6 +341,12 @@ class VerifyServiceRequestEmailView(generics.GenericAPIView):
             if not serviceRequest.is_verified:
                 serviceRequest.is_verified = True
                 serviceRequest.save()
+                mailer.sib_send_mail(
+                    to=[{"email": payload["email"], "name": payload["email"]}],
+                    cc=[{"email": "support@manufacturersnigeria.org"}],
+                    html_content="<p>Your request has been successfully submitted. You will be contacted soon</p>",
+                    subject="Successful Service Request",
+                )
                 return render(
                     request,
                     "ConfirmationPage.html",
@@ -675,13 +684,24 @@ class AllServicesDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 # PUBLIC VIEWS
+from django.db.models import Q
 
 
 class AllServicesViewPublic(generics.ListAPIView):
     serializer_class = AllServicesSerializer
 
     def get_queryset(self):
-        return AllServices.objects.all()
+        queryset = AllServices.objects.all()
+        search = self.request.GET.get("search")
+        service_type = self.request.GET.get("type")
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        if service_type:
+            queryset = queryset.filter(type=service_type)
+
+        return queryset
 
     def list(self, request):
         queryset = self.get_queryset()

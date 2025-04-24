@@ -5,6 +5,9 @@ urlpatterns = [
     # CONTACT US ENDPOINTS
     path("contact", views.AboutContactUsView.as_view(), name="about-contact"),
     path(
+        "contact/verify", views.VerifyEmailView.as_view(), name="about-contact-verify"
+    ),
+    path(
         "contact/download/",
         views.AboutContactUsDownloadView.as_view(),
         name="about-contact-download",

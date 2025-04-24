@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status, exceptions, permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
-from utils import custom_parsers, custom_response, custom_permissions
+from utils import custom_parsers, custom_response, custom_permissions, mailer
 from aboutus import serializers
 from aboutus import models
 
@@ -102,12 +102,25 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 100
 
 
+import random
+from .models import EmailOTP
+
+
+def generate_otp():
+    return f"{random.randint(100000, 999999)}"
+
+
 class AboutContactUsView(generics.GenericAPIView):
     serializer_class = serializers.AboutContactUsSerializer
     permission_classes = (custom_permissions.IsPostRequestOrAuthenticated,)
     pagination_class = CustomPagination
 
     def get_queryset(self):
+        verified = self.request.query_params.get("verified", None) == "true"
+        if verified is not None:
+            return models.AboutContactUs.objects.filter(verified=verified).order_by(
+                "-created_at"
+            )
         return models.AboutContactUs.objects.all().order_by("-created_at")
 
     def get(self, request, id=None):
@@ -118,13 +131,116 @@ class AboutContactUsView(generics.GenericAPIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
+        print("Incoming request data:", request.data)
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        contact_instance = serializer.save()
+        print("Data serialized and saved successfully.")
+
+        otp_instance = EmailOTP.objects.create(
+            email=contact_instance.email,
+            message_id=contact_instance,  # Set FK to AboutContactUs
+        )
+        print("Created OTP instance:", otp_instance)
+
+        # Append token and email as query params
+        base_url = request.data.get("frontend_url")
+        print("Received frontend_url:", base_url)
+
+        verification_link = (
+            f"{base_url}?token={otp_instance.token}&email={otp_instance.email}"
+        )
+        print("Generated verification link:", verification_link)
+
+        # Notify Admin / Send verification
+        mailer.sib_send_mail(
+            to=[{"email": request.data["email"], "name": request.data["name"]}],
+            cc=[{"email": "support@manufacturersnigeria.org"}],
+            subject="Email Verification",
+            html_content=f"""
+            <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+                <p>Dear {request.data["name"].split()[0]},</p>
+                <p>Thank you for reaching out to the Manufacturers Association of Nigeria (MAN).</p>
+                <p>Please click the button below to verify your email address:</p>
+                <p style="text-align: center;">
+                    <a href="{verification_link}" style="display: inline-block; padding: 10px 20px; background-color: #2b3513; color: #fff; text-decoration: none; border-radius: 5px;">
+                        Verify My Email
+                    </a>
+                </p>
+                <p>If you did not initiate this request, you can safely ignore this email.</p>
+                <p>Best regards,<br>MAN Support Team</p>
+                <hr>
+                <p style="font-size: 12px; color: #888;">
+                    This is an automated message. Please do not reply directly to this email.
+                </p>
+            </div>
+            """,
+        )
+        print("Verification email sent.")
+
         return custom_response.Success_response(
             msg="contact message sent",
             status_code=status.HTTP_201_CREATED,
             data=serializer.data,
+        )
+
+
+from rest_framework.response import Response
+from django.utils import timezone
+from datetime import timedelta
+
+
+class VerifyEmailView(APIView):
+    def post(self, request):
+        token = request.data.get("token")
+        email = request.data.get("email")
+
+        if not token or not email:
+            return Response(
+                {"detail": "Missing token or email."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            otp_entry = EmailOTP.objects.get(token=token, email=email)
+        except EmailOTP.DoesNotExist:
+            return Response(
+                {"detail": "Invalid token or email."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Check if the related 'AboutContactUs' entry is already verified
+        about_contact = (
+            otp_entry.message_id
+        )  # This is the related 'AboutContactUs' entry
+        if about_contact and about_contact.verified:
+            return custom_response.Success_response(
+                msg="Email already verified.",
+                data={"email": otp_entry.email},
+            )
+
+        # Check if token has expired (15 minutes max)
+        if otp_entry.is_expired():
+            return Response(
+                {"detail": "Token has expired."},
+                status=status.HTTP_410_GONE,
+            )
+
+        # Mark the email as verified (by marking the related 'AboutContactUs' as verified)
+        if about_contact:
+            about_contact.verified = True
+            about_contact.save()
+            mailer.sib_send_mail(
+                to=[{"email": otp_entry.email, "name": otp_entry.email}],
+                cc=[{"email": "support@manufacturersnigeria.org"}],
+                html_content="<p>Your request has been successfully submitted. You will be contacted soon</p>",
+                subject="Your Message has been Delivered",
+            )
+
+        return custom_response.Success_response(
+            msg="Email verified successfully.",
+            data={"email": otp_entry.email},
         )
 
 
