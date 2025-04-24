@@ -1,7 +1,15 @@
 from app.serializer import CloudinaryImageField
 from structure.models import SectoralGroup, MRC, MRCServices, MPDCL, MPDCLServices
 from rest_framework import serializers
-from .models import MrcContactPage
+from .models import MrcContactPage, SectorialBanner
+
+
+class SectorialBannerSerializer(serializers.ModelSerializer):
+    banner_image = CloudinaryImageField(required=False)
+
+    class Meta:
+        model = SectorialBanner
+        fields = ["id", "banner_image"]
 
 
 class MrcContactPageSerializer(serializers.ModelSerializer):

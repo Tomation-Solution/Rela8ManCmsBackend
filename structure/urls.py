@@ -4,6 +4,16 @@ from structure import views
 urlpatterns = [
     path("sectoral-group", views.SectoralGroupView.as_view(), name="sectoral-group"),
     path(
+        "sectorial-banner/",
+        views.PublicSectorialBannerView.as_view(),
+        name="get-sectorial-banner",
+    ),
+    path(
+        "sectorial-banner/update/",
+        views.ProtectedSectorialBannerUpdateView.as_view(),
+        name="update-sectorial-banner",
+    ),
+    path(
         "sectoral-group/<int:id>",
         views.SectoralGroupDetailView.as_view(),
         name="sectoral-group-details",

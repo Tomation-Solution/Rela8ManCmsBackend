@@ -6,6 +6,15 @@ from cloudinary_storage.storage import (
 
 
 # Create your models here.
+class SectorialBanner(models.Model):
+    banner_image = models.ImageField(
+        storage=MediaCloudinaryStorage(), default=None, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return f"Sectorial banner {self.id}"
+
+
 class SectoralGroup(models.Model):
     writer = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     header = models.CharField(max_length=300, blank=False)

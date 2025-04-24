@@ -15,12 +15,55 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from .models import MrcContactPage
-from .serializers import MrcContactPageSerializer
+from .models import MrcContactPage, SectorialBanner
+from .serializers import MrcContactPageSerializer, SectorialBannerSerializer
 
 # Create your views here.
 
 # paginations.py or any utils file
+
+
+class PublicSectorialBannerView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            banner = SectorialBanner.objects.first()
+            if not banner:
+                return Response(
+                    {"detail": "No banner found."}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            serializer = SectorialBannerSerializer(banner)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProtectedSectorialBannerUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        try:
+            banner = SectorialBanner.objects.first()
+            if not banner:
+                banner = SectorialBanner.objects.create()
+
+            serializer = SectorialBannerSerializer(
+                banner, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MrcContactPageView(APIView):
