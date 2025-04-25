@@ -76,12 +76,12 @@ class HomePage(models.Model):
     slider_vision_message = models.CharField(max_length=255)
     slider_mission_message = models.CharField(max_length=255)
 
-    vision_intro = models.TextField()
-    mission_intro = models.TextField()
-    advocacy_intro = models.TextField()
-    history_intro = models.TextField()
-    why_join_intro = models.TextField()
-    members_intro = models.TextField()
+    vision_intro = models.TextField(blank=True, null=True)
+    mission_intro = models.TextField(blank=True, null=True)
+    advocacy_intro = models.TextField(blank=True, null=True)
+    history_intro = models.TextField(blank=True, null=True)
+    why_join_intro = models.TextField(blank=True, null=True)
+    members_intro = models.TextField(blank=True, null=True)
 
     slider_image1 = models.ImageField(
         storage=MediaCloudinaryStorage(), blank=True, null=True, default=None

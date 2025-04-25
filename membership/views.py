@@ -288,6 +288,7 @@ class HomePageView(APIView):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            print(serializer.data)
             return custom_response.Success_response(
                 msg="home main updated", data=serializer.data
             )
