@@ -5,7 +5,9 @@ from django.db.models import Q, UniqueConstraint
 
 
 class AGMHomepageCMS(models.Model):
-    event_id = models.OneToOneField(Event, on_delete=models.CASCADE)
+    event_id = models.OneToOneField(
+        Event, on_delete=models.CASCADE, null=True, blank=True
+    )
     main_image = models.ImageField(
         storage=MediaCloudinaryStorage(), upload_to="images/agm/", blank=True, null=True
     )
@@ -42,7 +44,9 @@ class AGMHomepageCMS(models.Model):
 
 
 class AGMProgrammeCMS(models.Model):
-    event_id = models.OneToOneField(Event, on_delete=models.CASCADE)
+    event_id = models.OneToOneField(
+        Event, on_delete=models.CASCADE, null=True, blank=True
+    )
     main_image = models.ImageField(
         storage=MediaCloudinaryStorage(), upload_to="images/agm/", blank=True, null=True
     )
@@ -107,7 +111,9 @@ class AGMSpeakers(models.Model):
 
 
 class AGMVenue(models.Model):
-    event_id = models.OneToOneField(Event, on_delete=models.CASCADE)
+    event_id = models.OneToOneField(
+        Event, on_delete=models.CASCADE, null=True, blank=True
+    )
     venue_image = models.ImageField(
         storage=MediaCloudinaryStorage(), upload_to="images/agm/", blank=True, null=True
     )
@@ -123,7 +129,9 @@ class AGMVenue(models.Model):
 
 
 class AGMExhibitionCMS(models.Model):
-    event_id = models.OneToOneField(Event, on_delete=models.CASCADE)
+    event_id = models.OneToOneField(
+        Event, on_delete=models.CASCADE, null=True, blank=True
+    )
     main_image = models.ImageField(
         storage=MediaCloudinaryStorage(), upload_to="images/agm/", blank=True, null=True
     )
