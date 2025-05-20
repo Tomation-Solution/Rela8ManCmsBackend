@@ -121,16 +121,38 @@ class TrainingsDetailView(generics.RetrieveUpdateDestroyAPIView):
         return queryset
 
 
+from django.utils.timezone import now
+
+
 class TrainingsViewPublic(generics.ListAPIView):
     serializer_class = TrainingsSerializer
 
     def get_queryset(self):
         queryset = Training.objects.all()
+        request = self.request
+        today = now().date()
+
+        include_past = request.GET.get("include_past") == "true"
+        past = request.GET.get("past") == "true"
+
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        if past:
+            queryset = queryset.filter(end_date__lt=today)
+        elif not include_past:
+            queryset = queryset.filter(end_date__gte=today)
+
+        if start_date:
+            queryset = queryset.filter(start_date__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(end_date__lte=end_date)
+
         return queryset
 
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return custom_response.Success_response(
-            data=serializer.data, msg="public trainings"
+            data=serializer.data, msg="Filtered public trainings"
         )

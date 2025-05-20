@@ -186,73 +186,39 @@ class EventView(APIView):
         return custom_response.Success_response(msg="events", data=serializer.data)
 
     def post(self, request, *args, **kwargs):
-        print("➤ Entering EventView.post()")
         data = request.data
-        print("  • raw request.data:", data)
         files = request.FILES
-        print("  • raw request.FILES:", files)
 
-        # parse flags
         is_agm_flag = str(data.get("is_agm", "")).lower() == "true"
         is_current_agm_flag = str(data.get("is_current_agm", "")).lower() == "true"
-        print(
-            f"  • Parsed is_agm_flag={is_agm_flag}, is_current_agm_flag={is_current_agm_flag}"
-        )
 
-        # enforce single current AGM
         if is_agm_flag and is_current_agm_flag:
-            print("  • Enforcing single current AGM: resetting existing ones to False")
-            reset_count = Event.objects.filter(is_current_agm=True).update(
-                is_current_agm=False
-            )
-            print(f"    – Updated {reset_count} existing event(s)")
+            Event.objects.filter(is_current_agm=True).update(is_current_agm=False)
 
-        # validate & save Event
-        print("  • Validating serializer with data…")
         serializer = self.serializer_class(data=data)
         if not serializer.is_valid():
-            # log the full errors dict
-            print("  ✗ Serializer validation failed with errors:", serializer.errors)
-            # then raise a DRF ValidationError containing those errors
             raise exceptions.ValidationError(serializer.errors)
-        print("  ✓ Serializer is valid")
 
         try:
-            print("  • Saving new Event instance…")
             event = serializer.save(
                 writer=request.user,
                 is_agm=is_agm_flag,
                 is_current_agm=(is_agm_flag and is_current_agm_flag),
             )
-            print(f"  ✓ Event saved with id={event.id}")
 
-            # pre-create empty AGM rows if needed
             if is_agm_flag:
-                print("  • Pre-creating related AGM CMS rows…")
-                print("    – AGMHomepageCMS")
                 AGMHomepageCMS.objects.create(event_id=event)
-                print("    – AGMProgrammeCMS")
                 AGMProgrammeCMS.objects.create(event_id=event)
-                print("    – AGMPrograms")
                 AGMPrograms.objects.create(event_id=event)
-                print("    – AGMSpeakers")
                 AGMSpeakers.objects.create(event_id=event)
-                print("    – AGMVenue")
                 AGMVenue.objects.create(event_id=event)
-                print("    – AGMExhibitionCMS")
                 AGMExhibitionCMS.objects.create(event_id=event)
-                print("    – AGMPreviousExhibitionAndCompanyImages")
                 AGMPreviousExhibitionAndCompanyImages.objects.create(event_id=event)
-                print("    – AGMFAQ")
                 AGMFAQ.objects.create(event_id=event)
-                print("  ✓ All AGM rows created")
 
-        except Exception as exc:
-            print("  ✗ Exception in EventView.post():", exc)
+        except Exception:
             raise exceptions.ValidationError({"detail": "Error creating event."})
 
-        # return created object
-        print("➤ Preparing response for created Event")
         out_serializer = self.serializer_class(event)
         return custom_response.Success_response(
             msg="event created",
@@ -359,14 +325,40 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
         return queryset
 
 
+from django.utils.timezone import now
+
+
 class EventViewPublic(generics.ListAPIView):
     serializer_class = EventsSerializer
 
     def get_queryset(self):
         queryset = Event.objects.all()
+        request = self.request
+        today = now().date()
+
+        # Handle past and upcoming filters
+        include_past = request.GET.get("include_past") == "true"
+        past = request.GET.get("past") == "true"
+
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        if past:
+            queryset = queryset.filter(end_date__lt=today)
+        elif not include_past:
+            queryset = queryset.filter(end_date__gte=today)
+
+        # Handle optional custom date range filters
+        if start_date:
+            queryset = queryset.filter(start_date__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(end_date__lte=end_date)
+
         return queryset
 
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return custom_response.Success_response(data=serializer.data, msg="events")
+        return custom_response.Success_response(
+            data=serializer.data, msg="Filtered events"
+        )
