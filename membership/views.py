@@ -282,7 +282,8 @@ class HomePageView(APIView):
 
     def put(self, request):
         try:
-            home_data = HomePage.objects.get(id=1)
+            # Try to get existing home data
+            home_data, created = HomePage.objects.get_or_create(id=1)
             serializer = self.serializer_class(
                 home_data, data=request.data, partial=True, context={"request": request}
             )
@@ -290,14 +291,15 @@ class HomePageView(APIView):
             serializer.save()
             print(serializer.data)
             return custom_response.Success_response(
-                msg="home main updated", data=serializer.data
+                msg="home main created" if created else "home main updated",
+                data=serializer.data
             )
-        except HomePage.DoesNotExist:
-            raise exceptions.NotFound
-        except Exception:
+        except Exception as e:
+            print("Error:", e)
             return custom_response.Response(
                 {"message": "bad request"}, status=status.HTTP_400_BAD_REQUEST
             )
+
 
 
 class WhyWeAreUniqueView(generics.ListCreateAPIView):

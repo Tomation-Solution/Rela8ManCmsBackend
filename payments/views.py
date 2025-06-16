@@ -28,6 +28,9 @@ from rest_framework.pagination import PageNumberPagination
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
 
 def process_payment(request):
     try:
@@ -96,13 +99,29 @@ class PaymentRedirectView(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
+            # Email validation
+            email = request.data.get("email")
+            if not email:
+                return JsonResponse(
+                    {"error": "Email address is required."}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                validate_email(email)
+            except ValidationError:
+                return JsonResponse(
+                    {"error": "Please enter a valid email address."}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             payment = process_payment(request)
 
             data = request.data
             model_data = {
                 "payment": payment,
                 "fullname": data.get("fullname"),
-                "email": data.get("email"),
+                "email": email,
                 "phone_number": data.get("phone_number"),
                 "company_name": data.get("company_name"),
                 "amount_to_pay": payment.amount,
@@ -126,13 +145,25 @@ class PaymentRedirectView(APIView):
                     reverse("download_publication", args=[str(download_link.token)])
                 )
 
-                # Notify Admin
+                # Send confirmation email to user
                 mailer.sib_send_mail(
-                    to=[
-                        {"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}
-                    ],
+                    to=[{"email": email, "name": model_data.get('fullname')}],
+                    subject="Publication Purchase Confirmation",
+                    html_content=f"""
+                        <p>Dear {model_data.get('fullname')},</p>
+                        <p>Your publication purchase has been successfully processed.</p>
+                        <p>You can download your publication using the link below:</p>
+                        <p><a href="{download_url}">Download Publication</a></p>
+                        <p>This link will expire in 12 hours.</p>
+                        <p>Thank you for your purchase!</p>
+                    """,
+                )
+
+                # Notify Admin (existing code)
+                mailer.sib_send_mail(
+                    to=[{"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}],
                     cc=[{"email": "support@manufacturersnigeria.org"}],
-                    subject=f"New {('Publication' if 'publication' in data else data.get('event_type', 'Event'))} Payment Received",
+                    subject=f"New Publication Payment Received",
                     html_content=f"""
                         <p><strong>New Payment Received</strong></p>
                         <p><strong>Full Name:</strong> {model_data.get('fullname')}</p>
@@ -140,65 +171,76 @@ class PaymentRedirectView(APIView):
                         <p><strong>Phone:</strong> {model_data.get('phone_number')}</p>
                         <p><strong>Company:</strong> {model_data.get('company_name')}</p>
                         <p><strong>Amount Paid:</strong> ₦{model_data.get('amount_to_pay')}</p>
-                        {"<p><strong>Publication ID:</strong> " + str(data.get("publication")) + "</p>" if "publication" in data else ""}
-                        {"<p><strong>Event Type:</strong> " + data.get("event_type") + "</p>" if "event_type" in data else ""}
-                        {"<p><strong>Event/Training ID:</strong> " + str(data.get("event")) + "</p>" if "event" in data else ""}
+                        <p><strong>Publication ID:</strong> {data.get('publication')}</p>
                     """,
                 )
 
                 return JsonResponse(
                     {
-                        "message": "Payment processed successfully.",
+                        "message": "Payment processed successfully. Check your email for confirmation.",
                         "download_url": download_url,
                         "expires_at": download_link.expires_at.isoformat(),
                     },
                     status=status.HTTP_200_OK,
                 )
             else:
-                # fallback for event-type
+                # Handle event/training registration
                 event_type = data.get("event_type")
                 model_data["event_type"] = event_type
 
                 if event_type == "TRAINING":
                     training_id = data.get("event")
-                    training_instance = (
-                        Training.objects.get(id=training_id) if training_id else None
-                    )
+                    training_instance = Training.objects.get(id=training_id) if training_id else None
                     model_data["training"] = training_instance
                     model_data["event"] = None
+                    event_name = training_instance.name if training_instance else "Training"
 
                 elif event_type == "EVENT":
                     event_id = data.get("event")
-                    event_instance = (
-                        Event.objects.get(id=event_id) if event_id else None
-                    )
+                    event_instance = Event.objects.get(id=event_id) if event_id else None
                     model_data["event"] = event_instance
                     model_data["training"] = None
+                    event_name = event_instance.name if event_instance else "Event"
+                else:
+                    event_name = "Event/Training"
 
                 EventTrainingRegistration.objects.create(**model_data)
 
-                # Notify Admin
+                # Send confirmation email to user
                 mailer.sib_send_mail(
-                    to=[
-                        {"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}
-                    ],
-                    cc=[{"email": "support@manufacturersnigeria.org"}],
-                    subject=f"New {('Publication' if 'publication' in data else data.get('event_type', 'Event'))} Payment Received",
+                    to=[{"email": email, "name": model_data.get('fullname')}],
+                    subject=f"{event_type.title()} Registration Confirmation",
                     html_content=f"""
-                        <p><strong>New Payment Received</strong></p>
+                        <p>Dear {model_data.get('fullname')},</p>
+                        <p>Your request has been successfully submitted. You will be contacted soon.</p>
+                        <p><strong>Registration Details:</strong></p>
+                        <p><strong>Event/Training:</strong> {event_name}</p>
+                        <p><strong>Type:</strong> {event_type}</p>
+                        <p><strong>Email:</strong> {email}</p>
+                        <p><strong>Phone:</strong> {model_data.get('phone_number')}</p>
+                        <p>Thank you for registering with us!</p>
+                    """,
+                )
+
+                # Notify Admin (existing code)
+                mailer.sib_send_mail(
+                    to=[{"email": "info@manufacturersnigeria.org", "name": "MAN Admin"}],
+                    cc=[{"email": "support@manufacturersnigeria.org"}],
+                    subject=f"New {event_type} Registration",
+                    html_content=f"""
+                        <p><strong>New Registration Received</strong></p>
                         <p><strong>Full Name:</strong> {model_data.get('fullname')}</p>
                         <p><strong>Email:</strong> {model_data.get('email')}</p>
                         <p><strong>Phone:</strong> {model_data.get('phone_number')}</p>
                         <p><strong>Company:</strong> {model_data.get('company_name')}</p>
                         <p><strong>Amount Paid:</strong> ₦{model_data.get('amount_to_pay')}</p>
-                        {"<p><strong>Publication ID:</strong> " + str(data.get("publication")) + "</p>" if "publication" in data else ""}
-                        {"<p><strong>Event Type:</strong> " + data.get("event_type") + "</p>" if "event_type" in data else ""}
-                        {"<p><strong>Event/Training ID:</strong> " + str(data.get("event")) + "</p>" if "event" in data else ""}
+                        <p><strong>Event Type:</strong> {event_type}</p>
+                        <p><strong>Event/Training:</strong> {event_name}</p>
                     """,
                 )
 
                 return JsonResponse(
-                    {"message": "Payment processed successfully."},
+                    {"message": "Registration successful! Check your email for confirmation. You will be contacted soon."},
                     status=status.HTTP_200_OK,
                 )
 
@@ -210,7 +252,6 @@ class PaymentRedirectView(APIView):
                 {"error": "An unexpected error occurred.", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
 
 class DownloadPublicationPDFView(generics.GenericAPIView):
     """
