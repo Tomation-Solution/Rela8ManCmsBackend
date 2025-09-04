@@ -61,3 +61,91 @@ class HomePageSliderViewset(viewsets.ModelViewSet):
             return Response(
                 {"error": "Slider not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class FooterContentViewset(viewsets.ModelViewSet):
+    serializer_class = serializer.FooterContentSerializer
+    permission_classes = [custom_permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return models.FooterContent.objects.all()
+
+    def get_object(self):
+        """Always return the single footer content instance"""
+        return models.FooterContent.get_instance()
+
+    def list(self, request, *args, **kwargs):
+        """Return the single footer content instance"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, context={"request": request})
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return the single footer content instance"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, context={"request": request})
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Create or update the single footer content instance"""
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Update the single footer content instance"""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Partial update the single footer content instance"""
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Prevent deletion of footer content"""
+        return Response(
+            {"error": "Footer content cannot be deleted"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
+    @action(detail=False, methods=["get"], permission_classes=[])
+    def content(self, request):
+        """Public endpoint to get footer content"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, context={"request": request})
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        methods=["patch"],
+        permission_classes=[custom_permissions.IsAuthenticated],
+    )
+    def update_content(self, request):
+        """Update footer content"""
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Footer content updated successfully", "data": serializer.data},
+            status=status.HTTP_200_OK,
+        )

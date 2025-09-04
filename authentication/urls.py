@@ -1,4 +1,4 @@
-# urls.py
+# authentication/urls.py - Updated version
 from django.urls import path
 from authentication import views
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -11,9 +11,10 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/blacklist/", views.LogoutUserView.as_view(), name="token_blacklist"),
     path("create-account/", views.CreateAccount.as_view(), name="create-account"),
-    # New URLs to support frontend functionality
+    # Admin management URLs
     path("admins/", views.AdminListView.as_view(), name="admin-list"),
     path("admin/<int:pk>", views.AdminDetailView.as_view(), name="admin-detail"),
+    # Password reset URLs
     path(
         "password-reset/request/",
         views.RequestPasswordResetView.as_view(),
